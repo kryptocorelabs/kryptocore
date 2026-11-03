@@ -1,5 +1,7 @@
 # KryptoCore
 
+<img src="branding/kryptocore.png" alt="KryptoCore emblem" width="160">
+
 A small library for local authenticated encryption and password-based key
 derivation. The Rust implementation is in `rust/`. The Python reference uses
 PyNaCl/libsodium and argon2-cffi to check interoperability.
