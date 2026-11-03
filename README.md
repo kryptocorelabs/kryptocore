@@ -50,6 +50,22 @@ The new API starts independently of the archived v0.5 container format.
 
 ## Contribute
 
+See [API and data format versioning](VERSIONING.md) for compatibility rules.
+
+### Security checks
+
+With the Python reference installed, run the cross-language tests using
+`cargo test --locked --release -p kryptocore --test interop -- --ignored`.
+Set `PYTHON` to the interpreter path if the command is `python3` on your system.
+CI also runs the Rust and Python suites on Windows, Linux and macOS.
+
+With `cargo-audit` installed, run `cargo audit --deny warnings` and
+`cargo audit --file fuzz/Cargo.lock --deny warnings`. With nightly Rust and
+`cargo-fuzz` installed, run
+`cargo +nightly fuzz run aead -- -max_total_time=45 -max_len=4096`.
+These checks cover known dependency advisories and exercise authenticated
+encryption and decryption. See the [security scope](SECURITY.md) for review status.
+
 Install the test dependencies with `python -m pip install -e ".[dev]"` and run
 `python -m pytest`. Describe changes to the security assumptions or public API
 in the pull request. Use the private reporting channel in [SECURITY.md](SECURITY.md)

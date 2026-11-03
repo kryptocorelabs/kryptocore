@@ -1,6 +1,11 @@
 name: Tests
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '27 4 * * 1'
 
 permissions:
   contents: read
@@ -9,7 +14,7 @@ jobs:
   rust:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
@@ -21,7 +26,7 @@ jobs:
   test:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         python: ['3.9', '3.14']
     runs-on: ${{ matrix.os }}
     steps:
@@ -33,3 +38,30 @@ jobs:
           python-version: ${{ matrix.python }}
       - run: python -m pip install ".[dev]"
       - run: python -m pytest
+      - run: rustup toolchain install stable --profile minimal
+      - run: cargo +stable test --locked --release -p kryptocore --test interop -- --ignored
+
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - run: rustup toolchain install stable --profile minimal
+      - run: cargo +stable install --locked cargo-audit
+      - run: cargo +stable audit --deny warnings
+      - run: cargo +stable audit --file fuzz/Cargo.lock --deny warnings
+
+  fuzz:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - run: rustup toolchain install nightly --profile minimal
+      - run: cargo +nightly install --locked cargo-fuzz
+      - run: cargo +nightly metadata --locked --manifest-path fuzz/Cargo.toml --format-version 1 > /dev/null
+      - run: cargo +nightly fuzz run aead -- -max_total_time=45 -max_len=4096
+      - run: git diff --exit-code -- fuzz/Cargo.lock

@@ -1,0 +1,22 @@
+[package]
+name = "kryptocore-fuzz"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+kryptocore = { path = ".." }
+
+[workspace]
+members = ["."]
+
+[[bin]]
+name = "aead"
+path = "fuzz_targets/aead.rs"
+test = false
+doc = false
+bench = false
