@@ -53,6 +53,8 @@ The new API starts independently of the archived v0.5 container format.
 ## Contribute
 
 See [API and data format versioning](VERSIONING.md) for compatibility rules.
+See the [architecture](ARCHITECTURE.md), [threat model](THREAT_MODEL.md), and
+[build and artifact verification](BUILD.md) for design and release details.
 
 ### Security checks
 

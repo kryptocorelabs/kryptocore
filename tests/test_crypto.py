@@ -56,3 +56,20 @@ def test_argon2id_matches_libsodium():
 def test_invalid_derivation_inputs(password, salt):
     with pytest.raises(ValueError):
         derive_key(password, salt)
+
+
+@pytest.mark.parametrize("nonce", [b"", bytes(23), bytes(25), "not bytes"])
+def test_rejects_malformed_nonce(nonce):
+    key = bytes(32)
+    _, ciphertext = encrypt(key, b"binary\0\xff", aad=b"context\0")
+    with pytest.raises((ValueError, TypeError)):
+        decrypt(key, nonce, ciphertext, aad=b"context\0")
+
+
+def test_binary_inputs_and_appended_ciphertext():
+    key = bytes(range(32))
+    aad = bytes(range(256))
+    nonce, ciphertext = encrypt(key, aad, aad=aad)
+    assert decrypt(key, nonce, ciphertext, aad=aad) == aad
+    with pytest.raises(AuthenticationError):
+        decrypt(key, nonce, ciphertext + b"\0", aad=aad)

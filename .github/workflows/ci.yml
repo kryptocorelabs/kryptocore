@@ -13,8 +13,9 @@ permissions:
 jobs:
   rust:
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-15-intel]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
@@ -25,8 +26,9 @@ jobs:
 
   test:
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-15-intel]
         python: ['3.9', '3.14']
         exclude:
           - os: ubuntu-latest
@@ -72,3 +74,16 @@ jobs:
       - run: cargo +nightly metadata --locked --manifest-path fuzz/Cargo.toml --format-version 1 > /dev/null
       - run: cargo +nightly fuzz run aead -- -max_total_time=45 -max_len=4096
       - run: git diff --exit-code -- fuzz/Cargo.lock
+
+  source-artifact:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - run: bash scripts/source-archive.sh
+      - uses: actions/upload-artifact@v6
+        with:
+          name: core-source-${{ github.sha }}
+          path: dist/source/
+          if-no-files-found: error
