@@ -3,6 +3,7 @@
 <img src="branding/kryptocore.png" alt="KryptoCore emblem" width="112">
 
 [![Tests on main](https://github.com/kryptocorelabs/kryptocore/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/kryptocorelabs/kryptocore/actions/workflows/ci.yml)
+[![Rust dependency licenses](https://github.com/kryptocorelabs/kryptocore/actions/workflows/licenses.yml/badge.svg?branch=main)](https://github.com/kryptocorelabs/kryptocore/actions/workflows/licenses.yml)
 [MIT License](LICENSE) · [Security](SECURITY.md) · [Contribute](CONTRIBUTING.md)
 
 KryptoCore is a small, community-developed Rust library for local authenticated
@@ -15,6 +16,10 @@ improve it under the MIT license, or build an application on top of it.
 
 The API is in development. Use synthetic data when evaluating it and read the
 [threat model](THREAT_MODEL.md) before integrating it into an application.
+
+[KryptoCore Vault](https://github.com/kryptocorelabs/vault) is a Windows password
+manager built on the library. Its desktop downloads and Firefox integration
+updates are managed separately.
 
 ## Quick start
 
@@ -41,7 +46,7 @@ fn main() -> Result<(), kryptocore::Error> {
 
 The Rust API generates opaque keys and uses the operating system for randomness.
 Keep ownership of passwords and salts in the application. The library overwrites
-its returned key and plaintext buffers on drop. This applies to those buffers.
+its returned key and plaintext buffers and the Argon2 work buffer on drop.
 Applications should handle copies, input buffers, and process memory separately.
 
 ### Python reference

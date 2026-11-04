@@ -1,7 +1,7 @@
 #![forbid(unsafe_code)]
 //! Local authenticated encryption and password-based key derivation.
 
-use argon2::{Algorithm, Argon2, Params, Version};
+use argon2::{Algorithm, Argon2, Block, Params, Version};
 use chacha20poly1305::{
     aead::{Aead, KeyInit, Payload},
     XChaCha20Poly1305,
@@ -42,9 +42,10 @@ pub fn derive_key(password: &[u8], salt: &Salt) -> Result<Key, Error> {
         return Err(Error::EmptyPassword);
     }
     let params = Params::new(256 * 1024, 3, 1, Some(32)).map_err(|_| Error::DerivationFailed)?;
+    let mut memory = Zeroizing::new(vec![Block::default(); params.block_count()]);
     let mut key = Zeroizing::new([0u8; 32]);
     Argon2::new(Algorithm::Argon2id, Version::V0x13, params)
-        .hash_password_into(password, salt, &mut key[..])
+        .hash_password_into_with_memory(password, salt, &mut key[..], &mut memory[..])
         .map_err(|_| Error::DerivationFailed)?;
     Ok(Key(key))
 }
