@@ -1,19 +1,42 @@
 # KryptoCore
 
-<img src="branding/kryptocore.png" alt="KryptoCore emblem" width="160">
+<img src="branding/kryptocore.png" alt="KryptoCore emblem" width="112">
 
-A small library for local authenticated encryption and password-based key
-derivation. The Rust implementation is in `rust/`. The Python reference uses
-PyNaCl/libsodium and argon2-cffi to check interoperability.
-Vault, hardware keys, file formats, and browser integration live above this API.
+[![Tests on main](https://github.com/kryptocorelabs/kryptocore/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/kryptocorelabs/kryptocore/actions/workflows/ci.yml)
+[MIT License](LICENSE) · [Security](SECURITY.md) · [Contribute](CONTRIBUTING.md)
 
-The API is in development. Review the [security scope](SECURITY.md) before using
-this preview with sensitive data.
+KryptoCore is a small, community-developed Rust library for local authenticated
+encryption and password-based key derivation. Anyone can use, study, and
+improve it under the MIT license, or build an application on top of it.
 
-## Build and test Rust
+- Encrypt and authenticate data with XChaCha20-Poly1305.
+- Derive encryption keys from passwords with Argon2id.
+- Check Rust and Python interoperability with the included reference implementation.
+
+The API is in development. Use synthetic data when evaluating it and read the
+[threat model](THREAT_MODEL.md) before integrating it into an application.
+
+## Quick start
 
 ```sh
+git clone https://github.com/kryptocorelabs/kryptocore.git
+cd kryptocore
 cargo test --workspace --locked --release
+```
+
+### Rust
+
+```rust
+use kryptocore::{decrypt, encrypt, Key};
+
+fn main() -> Result<(), kryptocore::Error> {
+    let key = Key::generate()?;
+    let context = b"example/v1";
+    let (nonce, ciphertext) = encrypt(&key, b"hello", context)?;
+    let plaintext = decrypt(&key, &nonce, &ciphertext, context)?;
+    assert_eq!(&plaintext[..], b"hello");
+    Ok(())
+}
 ```
 
 The Rust API generates opaque keys and uses the operating system for randomness.
@@ -21,7 +44,7 @@ Keep ownership of passwords and salts in the application. The library overwrites
 its returned key and plaintext buffers on drop. This applies to those buffers.
 Applications should handle copies, input buffers, and process memory separately.
 
-## Try the Python reference
+### Python reference
 
 ```sh
 python -m pip install -e .
@@ -52,6 +75,7 @@ The new API starts independently of the archived v0.5 container format.
 
 ## Contribute
 
+Code review, interoperability tests, and clear documentation are welcome.
 Read the [contribution guide](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md).
 
 See [API and data format versioning](VERSIONING.md) for compatibility rules.
