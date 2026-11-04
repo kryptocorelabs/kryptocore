@@ -31,6 +31,5 @@ Keep fixtures for every supported version, with a negative case for modified
 headers and an explicit test for unknown versions. The cross-language tests in
 this repository cover the primitives. Each application tests its own format.
 
-Vault's current `KCV1` is a development format and belongs to Vault. Any future
-recovery-capable format needs its own version and a migration path for existing
-preview files.
+[Vault](https://github.com/kryptocorelabs/vault) maintains its own container
+versions and migration paths for existing preview files.

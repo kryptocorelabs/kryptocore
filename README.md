@@ -4,7 +4,7 @@
 
 [![Tests on main](https://github.com/kryptocorelabs/kryptocore/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/kryptocorelabs/kryptocore/actions/workflows/ci.yml)
 [![Rust dependency licenses](https://github.com/kryptocorelabs/kryptocore/actions/workflows/licenses.yml/badge.svg?branch=main)](https://github.com/kryptocorelabs/kryptocore/actions/workflows/licenses.yml)
-[MIT License](LICENSE) · [Security](SECURITY.md) · [Contribute](CONTRIBUTING.md)
+[MIT License](LICENSE) · [Security](SECURITY.md) · [Contribute](CONTRIBUTING.md) · [Discussions](https://github.com/kryptocorelabs/kryptocore/discussions)
 
 KryptoCore is a small, community-developed Rust library for local authenticated
 encryption and password-based key derivation. Anyone can use, study, and
@@ -23,9 +23,14 @@ updates are managed separately.
 
 ## Quick start
 
+Install Git and the stable [Rust toolchain](https://rustup.rs/). On Windows
+with the MSVC toolchain, install the C++ build tools and Windows SDK when
+prompted by Rustup.
+
 ```sh
 git clone https://github.com/kryptocorelabs/kryptocore.git
 cd kryptocore
+cargo build --locked --release
 cargo test --workspace --locked --release
 ```
 
@@ -50,6 +55,9 @@ its returned key and plaintext buffers and the Argon2 work buffer on drop.
 Applications should handle copies, input buffers, and process memory separately.
 
 ### Python reference
+
+Use Python 3.9 or later. See the [contribution guide](CONTRIBUTING.md#run-the-tests)
+for virtual environment commands on Windows and Unix.
 
 ```sh
 python -m pip install -e .
@@ -82,6 +90,8 @@ The new API starts independently of the archived v0.5 container format.
 
 Code review, interoperability tests, and clear documentation are welcome.
 Read the [contribution guide](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md).
+Pick a [good first issue](https://github.com/kryptocorelabs/kryptocore/labels/good%20first%20issue)
+or ask a question in [Discussions](https://github.com/kryptocorelabs/kryptocore/discussions).
 
 See [API and data format versioning](VERSIONING.md) for compatibility rules.
 See the [architecture](ARCHITECTURE.md), [threat model](THREAT_MODEL.md), and
