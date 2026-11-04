@@ -15,8 +15,9 @@ cd dist/source
 sha256sum -c SHA256SUMS.txt
 ```
 
-The script archives a commit from Git, uses stable permissions and suppresses
-gzip filename and timestamp metadata. It generates the archive twice and
+The script archives a commit from Git with automatic line ending conversion
+disabled. It uses stable permissions and suppresses gzip filename and timestamp
+metadata. It generates the archive twice and
 compares the bytes. `SOURCE.txt` records the full commit and tool versions.
 Use the same Git and gzip versions when comparing builds. CI stores the archive,
 checksum and source record together on the workflow run. The source artifact
