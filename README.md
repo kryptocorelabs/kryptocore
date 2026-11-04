@@ -24,12 +24,17 @@ updates are managed separately.
 
 ## Why KryptoCore?
 
-KryptoCore aims to give application developers a small, transparent,
-community-maintained foundation for local encryption. It uses established
-cryptographic libraries and focuses on a small API, reproducible tests, and
-public documentation of its [security boundaries](THREAT_MODEL.md).
-Developers, reviewers, and security researchers are welcome to test those
-assumptions and improve the project.
+KryptoCore is an open-source Rust library for local authenticated encryption
+and password-based key derivation. We build on established cryptographic
+libraries and focus on a small API, tests that contributors can reproduce,
+and documentation that explains what the library protects and what callers
+need to handle.
+
+We’re looking for developers, reviewers, and security researchers to try the
+API, improve the tests and documentation, and challenge our security
+assumptions. If you’d like to help, pick a
+[first issue](https://github.com/kryptocorelabs/kryptocore/labels/good%20first%20issue)
+or start a [discussion](https://github.com/kryptocorelabs/kryptocore/discussions).
 
 ## Quick start
 
