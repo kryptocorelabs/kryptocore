@@ -106,4 +106,8 @@ Install the test dependencies with `python -m pip install -e ".[dev]"` and run
 in the pull request. Use the private reporting channel in [SECURITY.md](SECURITY.md)
 for vulnerabilities.
 
-MIT licensed. See [LICENSE](LICENSE).
+## Support KryptoCore
+
+Sponsorship helps fund Core maintenance, cross-platform testing, documentation,
+and independent security review. KryptoCore is free to use and build on under
+the [MIT license](LICENSE).
