@@ -14,12 +14,22 @@ improve it under the MIT license, or build an application on top of it.
 - Derive encryption keys from passwords with Argon2id.
 - Check Rust and Python interoperability with the included reference implementation.
 
-The API is in development. Use synthetic data when evaluating it and read the
-[threat model](THREAT_MODEL.md) before integrating it into an application.
+KryptoCore is a development preview. Independent security review is pending.
+Use synthetic data for evaluation and read the [threat model](THREAT_MODEL.md)
+before integrating it into an application.
 
 [KryptoCore Vault](https://github.com/kryptocorelabs/vault) is a Windows password
 manager built on the library. Its desktop downloads and Firefox integration
 updates are managed separately.
+
+## Why KryptoCore?
+
+KryptoCore aims to give application developers a small, transparent,
+community-maintained foundation for local encryption. It uses established
+cryptographic libraries and focuses on a small API, reproducible tests, and
+public documentation of its [security boundaries](THREAT_MODEL.md).
+Developers, reviewers, and security researchers are welcome to test those
+assumptions and improve the project.
 
 ## Quick start
 
@@ -35,6 +45,15 @@ cargo test --workspace --locked --release
 ```
 
 ### Rust
+
+The preview is distributed through GitHub. Add it as a Git dependency in
+your application's `Cargo.toml` and pin a full commit you have reviewed.
+Crates.io publication is disabled during the preview (`publish = false`).
+
+```toml
+[dependencies]
+kryptocore = { git = "https://github.com/kryptocorelabs/kryptocore.git", rev = "REPLACE_WITH_FULL_COMMIT_SHA" }
+```
 
 ```rust
 use kryptocore::{decrypt, encrypt, Key};
@@ -82,7 +101,8 @@ To derive a key from a password, call `derive_key(password_bytes, salt)` with a
 fresh random 16-byte salt for each new derivation context. Store the salt and
 profile with the encrypted data. The development profile uses Argon2id v19,
 256 MiB, three passes, one lane, and a 32-byte output. Applications define the
-password encoding and need to account for the cost of concurrent derivations.
+password encoding. See [Argon2id memory and concurrency](ARCHITECTURE.md#argon2id-memory-and-concurrency)
+for the memory cost and how to bound concurrent derivations.
 
 The new API starts independently of the archived v0.5 container format.
 

@@ -37,12 +37,17 @@ pub enum Error {
 /// Derive a key using Argon2id v19 with 256 MiB, three passes and one lane.
 /// The caller supplies a fresh random salt for each new derivation context
 /// and bounds the number of concurrent derivations.
+/// Returns [`Error::DerivationFailed`] if the allocator rejects the work buffer reservation.
 pub fn derive_key(password: &[u8], salt: &Salt) -> Result<Key, Error> {
     if password.is_empty() {
         return Err(Error::EmptyPassword);
     }
     let params = Params::new(256 * 1024, 3, 1, Some(32)).map_err(|_| Error::DerivationFailed)?;
-    let mut memory = Zeroizing::new(vec![Block::default(); params.block_count()]);
+    let mut memory = Zeroizing::new(Vec::new());
+    memory
+        .try_reserve_exact(params.block_count())
+        .map_err(|_| Error::DerivationFailed)?;
+    memory.resize(params.block_count(), Block::default());
     let mut key = Zeroizing::new([0u8; 32]);
     Argon2::new(Algorithm::Argon2id, Version::V0x13, params)
         .hash_password_into_with_memory(password, salt, &mut key[..], &mut memory[..])

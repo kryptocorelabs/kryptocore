@@ -23,6 +23,14 @@ jobs:
           persist-credentials: false
       - run: rustup toolchain install stable --profile minimal
       - run: cargo +stable test --workspace --locked --release
+      - name: Check Argon2id under parallel load and a process memory limit
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          cargo +stable test --locked --release --test argon2_memory -- --ignored --exact argon2id_derives_keys_concurrently
+          test_binary=$(cargo +stable test --locked --release --test argon2_memory --no-run --message-format=json |
+            jq -er 'select(.reason == "compiler-artifact" and .target.name == "argon2_memory") | .executable // empty')
+          (ulimit -v 196608 && "$test_binary" --ignored --exact argon2id_reports_reservation_failure)
 
   test:
     strategy:
