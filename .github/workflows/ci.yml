@@ -41,15 +41,14 @@ jobs:
         exclude:
           - os: ubuntu-latest
             python: '3.9'
+          # CPython 3.9 x64 requires Intel Homebrew libraries absent on arm64.
+          # Minimum-version compatibility remains covered on Linux and Windows.
+          - os: macos-15
+            python: '3.9'
         include:
           # setup-python has no CPython 3.9 build for Ubuntu 26.04.
           - os: ubuntu-24.04
             python: '3.9'
-          # CPython 3.9 has no macOS arm64 build in setup-python.
-          # The macOS arm64 runner includes Rosetta for the x64 interpreter.
-          - os: macos-15
-            python: '3.9'
-            architecture: x64
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
@@ -58,7 +57,6 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python }}
-          architecture: ${{ matrix.architecture }}
       - run: python -m pip install ".[dev]"
       - run: python -m pytest
       - run: rustup toolchain install stable --profile minimal
