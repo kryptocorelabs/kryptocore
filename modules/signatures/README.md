@@ -25,8 +25,10 @@ fn example() -> Result<(), Error> {
 }
 ```
 
-Applications opt in with a path dependency on this crate. Publication on crates.io
-is disabled. Callers own serialization, signer trust, key storage, rotation,
+Applications opt in with a workspace path dependency or a Git dependency pinned
+to a reviewed full commit from `kryptocorelabs/kryptocore` (package
+`kryptocore-signatures`). Publication on crates.io is disabled.
+Callers own serialization, signer trust, key storage, rotation,
 revocation and recovery. Do not generate a new key on every application start if
 the application needs a persistent identity. Store a dedicated signing seed in
 an authenticated, encrypted key store and explicitly protect exported copies.

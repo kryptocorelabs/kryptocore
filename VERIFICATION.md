@@ -8,10 +8,10 @@ signature companion. Existing application file formats remain unchanged.
 | Question | Existing mechanism | Owner |
 | --- | --- | --- |
 | Does ciphertext authenticate with this key, nonce and associated data? | XChaCha20-Poly1305 authentication before returning plaintext; failure returns `AuthenticationFailed`. | Core `decrypt` in `rust/lib.rs`. |
-| Are decrypted records, paths and file versions valid? | Format-specific parsers, size limits and schema/path validation. | Vault, Container and future Rescue format adapters. |
+| Are decrypted records, paths and file versions valid? | Format-specific parsers, size limits and schema/path validation. | Vault, Container and Rescue's shared readers for KCV1/KCV2 and KCC v1. |
 | Does a chat peer possess the selected peer key? | Noise KK handshake and encrypted ready confirmations in both directions. | MSG protocol, above Core. |
 | Does a container match an explicitly trusted signer's signature? | Existing detached OpenSSH signature verification over the exact SHA-256 digest, with a container-specific namespace and allowed signers. | Container `signature` module. |
-| Does a known format marker exist? | Bounded header inspection, explicitly unauthenticated. | Rescue foundation; not a content or sender verification. |
+| Does a known format marker exist? | Bounded header inspection, explicitly unauthenticated. | Rescue inspection; separate authenticated export requires the existing credential. MSG recovery remains unimplemented. |
 
 Symmetric authentication does not identify an individual sender: other
 holders of the same secret can also create authenticated ciphertext.
@@ -77,5 +77,6 @@ Keep distinct results such as `not checked`, `ciphertext authenticated`,
 unrelated properties into a universal `is_secure` flag.
 
 The MSG green marker represents the established authenticated chat channel.
-Rescue's current format recognition must remain explicitly unauthenticated.
+Rescue's format recognition remains explicitly unauthenticated. Its separate
+Vault/Container export marks success only after format-reader authentication.
 A future sender-signature marker must be distinct from both.
