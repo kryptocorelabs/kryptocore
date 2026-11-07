@@ -1,7 +1,7 @@
 # Build and artifact verification
 
 GitHub CI runs the Rust and Python suites and bidirectional interoperability
-checks on Windows, Linux, and Intel macOS. Linux also runs cargo-audit and a bounded
+checks on Windows, Linux, and macOS. Linux also runs cargo-audit and a bounded
 instrumented fuzz target. A passing dependency scan covers known advisories at
 the time of the run. Independent security review is still pending.
 

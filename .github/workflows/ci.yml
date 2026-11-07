@@ -61,6 +61,8 @@ jobs:
       - run: python -m pytest
       - run: rustup toolchain install stable --profile minimal
       - run: cargo +stable test --locked --release -p kryptocore --test interop -- --ignored
+      - name: Cross-check optional signatures with PyNaCl
+        run: cargo +stable test --locked --release -p kryptocore-signatures --test interop -- --ignored
 
   audit:
     runs-on: ubuntu-latest

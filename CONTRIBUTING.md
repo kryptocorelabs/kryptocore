@@ -68,3 +68,17 @@ cargo test --locked --release -p kryptocore --test interop -- --ignored
 ```
 
 See [BUILD.md](BUILD.md) for CI and artifact verification.
+
+## Optional signature companion
+
+`cargo test --workspace --locked --release` includes the signature unit
+and documentation tests. With PyNaCl installed, also run:
+
+```sh
+cargo test --locked --release -p kryptocore-signatures --test interop -- --ignored
+```
+
+See [the signature protocol](modules/signatures/README.md) before changing
+framing, purpose labels, key validation or dependencies. Keep encryption
+and signing keys separate. App protocols and trust decisions require
+their own review.

@@ -22,6 +22,18 @@ before integrating it into an application.
 manager built on the library. Its desktop downloads and Firefox integration
 updates are managed separately.
 
+## Optional signatures
+
+[KryptoCore Signatures](modules/signatures/README.md) is an optional Rust
+companion for purpose-bound Ed25519 signatures. It has separate signing
+keys and explicit verification inputs. The encryption Core has no signature
+dependency. This is a preview component; application integration and an
+independent audit remain pending. See [verification boundaries](VERIFICATION.md).
+
+For offline file inspection and the recovery roadmap, see
+[Rescue](https://github.com/kryptocorelabs/rescue). For conversations and
+files over Tor, see [MSG](https://github.com/kryptocorelabs/msg).
+
 ## Why KryptoCore?
 
 KryptoCore is an open-source Rust library for local authenticated encryption
