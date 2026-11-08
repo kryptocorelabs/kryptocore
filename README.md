@@ -38,17 +38,18 @@ files over Tor, see [MSG](https://github.com/kryptocorelabs/msg).
 
 ## Why KryptoCore?
 
-KryptoCore is an open-source Rust library for local authenticated encryption
-and password-based key derivation. We build on established cryptographic
-libraries and focus on a small API, tests that contributors can reproduce,
-and documentation that explains what the library protects and what callers
-need to handle.
+We want people to retain control of their data and keys through software they
+can inspect, use and improve. The Core stays small; applications and optional
+modules have explicit responsibilities and security boundaries. Established
+cryptographic libraries, reproducible tests and independent scrutiny guide
+the work. Open source alone does not guarantee security.
 
-We’re looking for developers, reviewers, and security researchers to try the
-API, improve the tests and documentation, and challenge our security
-assumptions. If you’d like to help, pick a
-[first issue](https://github.com/kryptocorelabs/kryptocore/labels/good%20first%20issue)
-or start a [discussion](https://github.com/kryptocorelabs/kryptocore/discussions).
+The whole ecosystem is open source under MIT for first-party code: Core,
+Vault, Firefox, Container, MSG and Rescue. See the
+[project charter](PROJECT_CHARTER.md),
+[application source](https://github.com/kryptocorelabs/apps-source) and
+[Vault/Firefox source](https://github.com/kryptocorelabs/vault-source).
+Contributions to code, tests, documentation and independent review are welcome.
 
 ## Quick start
 
