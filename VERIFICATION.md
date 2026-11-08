@@ -11,6 +11,8 @@ signature companion. Existing application file formats remain unchanged.
 | Are decrypted records, paths and file versions valid? | Format-specific parsers, size limits and schema/path validation. | Vault, Container and Rescue's shared readers for KCV1/KCV2 and KCC v1. |
 | Does a chat peer possess the selected peer key? | Noise KK handshake and encrypted ready confirmations in both directions. | MSG protocol, above Core. |
 | Does a container match an explicitly trusted signer's signature? | Existing detached OpenSSH signature verification over the exact SHA-256 digest, with a container-specific namespace and allowed signers. | Container `signature` module. |
+| Does a KCC file match the selected shared signing key? | Detached KCCS v1 manifest, Ed25519 via the companion, full-file SHA-256/length/kind binding and same-stream extraction checks. | Container and Rescue. |
+| Did the requested malware scan finish without detection? | Explicit local ClamAV selection; detection, errors and bounds block publication. This is not a virus-free certificate. | Container and Rescue, separately from signatures. |
 | Does a known format marker exist? | Bounded header inspection, explicitly unauthenticated. | Rescue inspection; separate authenticated export requires the existing credential. MSG recovery remains unimplemented. |
 
 Symmetric authentication does not identify an individual sender: other
@@ -23,7 +25,9 @@ without a suitable trust decision or independent comparison.
 Password derivation and authenticated encryption remain in the minimal Core.
 The separate [signature companion](modules/signatures/README.md) implements
 purpose-bound signing and strict verification. Core does not depend on it;
-applications must explicitly opt in. Application integration is still pending.
+applications must explicitly opt in. Container and Rescue now opt in for
+detached sender checks; Vault, MSG and the Firefox channel retain their
+existing authentication protocols.
 
 It wraps `ed25519-dalek = 2.2.0`, using pure Ed25519 with explicit versioned
 framing, separate purpose labels and bounded messages. Published
