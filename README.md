@@ -1,5 +1,7 @@
 # KryptoCore
 
+[Security in 30 seconds](SECURITY-IN-BRIEF.md) · [Recover without the main app](RESCUE-FIRST.md) · [Check a download](VERIFY-DOWNLOADS.md)
+
 <img src="branding/kryptocore.png" alt="KryptoCore emblem" width="112">
 
 [![Tests on main](https://github.com/kryptocorelabs/kryptocore/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/kryptocorelabs/kryptocore/actions/workflows/ci.yml)
@@ -18,7 +20,7 @@ KryptoCore is a development preview. Independent security review is pending.
 Use synthetic data for evaluation and read the [threat model](THREAT_MODEL.md)
 before integrating it into an application.
 
-[KryptoCore Vault](https://github.com/kryptocorelabs/vault) is a Windows password
+[KryptoCore Vault](https://github.com/kryptocorelabs/vault) is a local password
 manager built on the library. Its desktop downloads and Firefox integration
 updates are managed separately.
 
