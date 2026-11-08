@@ -27,8 +27,10 @@ updates are managed separately.
 [KryptoCore Signatures](modules/signatures/README.md) is an optional Rust
 companion for purpose-bound Ed25519 signatures. It has separate signing
 keys and explicit verification inputs. The encryption Core has no signature
-dependency. This is a preview component; application integration and an
-independent audit remain pending. See [verification boundaries](VERIFICATION.md).
+dependency. [Container](https://github.com/kryptocorelabs/container) and
+[Rescue](https://github.com/kryptocorelabs/rescue) use this preview component
+for optional detached KCC sender checks. An independent audit remains pending.
+See [verification boundaries](VERIFICATION.md).
 
 For offline file inspection and the recovery roadmap, see
 [Rescue](https://github.com/kryptocorelabs/rescue). For conversations and
