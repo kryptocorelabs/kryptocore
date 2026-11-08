@@ -110,6 +110,12 @@ justify concealing limitations.
 - [Vault](https://github.com/kryptocorelabs/vault), [Container](https://github.com/kryptocorelabs/container),
   [MSG](https://github.com/kryptocorelabs/msg) and [Rescue](https://github.com/kryptocorelabs/rescue) downloads and user guides
 
+Testing to date has been carried out by the KryptoCoreLabs maintainers, locally
+and through automated CI. No independent security audit has been completed.
+We welcome community testing, code reviews and scrutiny of our security
+assumptions. Please use synthetic data and report suspected vulnerabilities
+privately through the project's security-reporting channel.
+
 The current applications remain previews. Public source is an invitation
 to inspect and improve the work, not a claim that an independent audit or
 production release has already been completed.

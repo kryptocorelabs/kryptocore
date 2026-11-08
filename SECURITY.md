@@ -2,6 +2,12 @@
 
 KryptoCore is a development preview. Independent review is still pending.
 
+Testing to date has been carried out by the KryptoCoreLabs maintainers, locally
+and through automated CI. No independent security audit has been completed.
+We welcome community testing, code reviews and scrutiny of our security
+assumptions. Please use synthetic data and report suspected vulnerabilities
+privately through the project's security-reporting channel.
+
 The library authenticates each ciphertext and its associated data. The caller
 owns key storage, salt generation, format versioning, resource limits, and
 protection against replay or rollback. The Rust library processes complete

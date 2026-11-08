@@ -22,6 +22,12 @@ before integrating it into an application.
 manager built on the library. Its desktop downloads and Firefox integration
 updates are managed separately.
 
+Testing to date has been carried out by the KryptoCoreLabs maintainers, locally
+and through automated CI. No independent security audit has been completed.
+We welcome community testing, code reviews and scrutiny of our security
+assumptions. Please use synthetic data and report suspected vulnerabilities
+privately through the project's security-reporting channel.
+
 ## Optional signatures
 
 [KryptoCore Signatures](modules/signatures/README.md) is an optional Rust
