@@ -27,11 +27,12 @@ download you intend to use.
 | Messenger | [alpha.1](https://github.com/kryptocorelabs/msg/releases/tag/v0.1.0-alpha.1), [alpha.2 preview.4](https://github.com/kryptocorelabs/msg/releases/tag/v0.1.0-alpha.2-preview.4) |
 | Container | [alpha.1](https://github.com/kryptocorelabs/container/releases/tag/v0.1.0-alpha.1), [alpha.2 preview.1](https://github.com/kryptocorelabs/container/releases/tag/v0.1.0-alpha.2-preview.1) |
 | Rescue | [preview.2](https://github.com/kryptocorelabs/rescue/releases/tag/v0.1.0-preview.2), [preview.3](https://github.com/kryptocorelabs/rescue/releases/tag/v0.1.0-preview.3) |
+| Vault for Windows | [preview.4](https://github.com/kryptocorelabs/vault/releases/tag/v0.1.0-preview.4) |
 | Vault for Firefox | [0.1.16 XPI](https://github.com/kryptocorelabs/vault/releases/tag/firefox-v0.1.16) |
 
-The current manifest pairs expire on 2027-02-07 at 09:56:11 UTC. The historical
-Windows Vault ZIPs provide checksums and still need a verifiable build/source
-mapping for publisher signing.
+Each manifest records its own validity period. Windows Vault ZIPs through
+preview.3 provide checksums. The preview.4 ZIP also has a
+[reproduced and attested build](https://github.com/kryptocorelabs/vault-source/actions/runs/42687190479).
 
 ## Check an available Windows preview
 
