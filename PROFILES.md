@@ -33,6 +33,10 @@ fields, the application must encode them unambiguously.
 Generate a random data key and use an independent wrapping key or a strong
 password to protect it. A wrapped key can be stored next to its encrypted data.
 `unwrap_key` and `unwrap_key_with_password` return an opaque key after authentication.
+For applications that already hold 32 secret key bytes, `Key::from_bytes`
+copies them into an opaque key. Keep the source buffer short-lived and clear it
+where possible. Authenticate any existing wrapped record using its own format
+before importing its key bytes. Derive password-based keys with Argon2id.
 
 ```rust
 use kryptocore::{wrapping::{unwrap_key_with_password, wrap_key_with_password}, Context, Key};

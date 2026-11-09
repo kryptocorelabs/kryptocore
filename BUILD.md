@@ -57,3 +57,20 @@ tests. Python wheels and desktop distributions have separate build
 environments. Publisher-signed release manifests and platform code signing
 are separate release steps. See [Verify downloads](VERIFY-DOWNLOADS.md) and
 [GitHub artifact attestations](https://docs.github.com/en/actions/how-tos/secure-your-work/use-artifact-attestations/use-artifact-attestations).
+
+## Windows application builds
+
+Desktop applications use their own packaging recipes. See [Vault's Windows
+build](https://github.com/kryptocorelabs/vault-source/blob/main/apps/vault/WINDOWS-ONEFILE.md)
+and the [shared application builds](https://github.com/kryptocorelabs/apps-source/blob/main/apps/desktop/README.md).
+The reproducibility result above covers the Linux Core library and Core source
+archive. For a Windows preview, use its release-specific evidence. Rescue
+preview.3, for example, records a local Windows build and a public source commit
+with ZIP and EXE hashes. Independent Windows binary reproduction is pending.
+
+To establish reproducibility for a future Windows release, build its package
+twice from a clean public commit with pinned inputs and compare the exact bytes.
+Publish the commit, toolchain, packaging recipe and artifact hashes with the
+release. Workflow provenance, publisher-signed manifests and Authenticode each
+add a separate check. Publisher signing requires a provisioned signing key and
+a published trusted public key.

@@ -8,6 +8,10 @@ release notes with migration steps. Patch releases keep supported calls and
 their results compatible. From `1.0`, incompatible API changes require a major
 version. Test fixtures and fuzz targets are internal tooling.
 
+The Python reference deprecates omitting `aad` in `encrypt` and `decrypt`.
+Pass the existing format's exact AAD bytes explicitly, including `aad=b""`
+for formats that use empty AAD. This migration preserves ciphertext compatibility.
+
 The existing Argon2id profile is fixed for this API. New profiles must have an
 explicit identifier and preserve access to data written with older profiles
 for as long as those profiles are supported. A dependency update must still

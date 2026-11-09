@@ -94,10 +94,10 @@ fn main() -> Result<(), kryptocore::Error> {
 }
 ```
 
-The Rust API generates opaque keys and uses the operating system for randomness.
-Keep ownership of passwords and salts in the application. The library overwrites
-its returned key and plaintext buffers and the Argon2 work buffer on drop.
-Applications should handle copies, input buffers, and process memory separately.
+Use `Key::generate()` for a new key or `Key::from_bytes(&[u8; 32])` to import
+existing secret key material. Use `generate_salt()` for a new password derivation.
+The library overwrites its owned key and plaintext buffers and the Argon2 work
+buffer on drop. The caller manages passwords, original key bytes and other copies.
 
 Use `derive_key_detailed` to distinguish rejected input from failure to
 reserve the Argon2 work buffer. Use `decrypt_checked` when a parser supplies
@@ -132,12 +132,15 @@ assert decrypt(key, nonce, ciphertext, aad=b"example/v1") == b"hello"
 
 Keep the key secret. Store the nonce alongside the ciphertext. Associated data
 is authenticated and remains public. Supply exactly the same bytes when decrypting.
+Pass `aad` explicitly for every call. Use `aad=b""` when the format specifies
+empty AAD. Omitting it still uses empty AAD and emits a `DeprecationWarning`.
 If authentication fails, `decrypt` raises `AuthenticationError` for well-formed
 inputs. The ciphertext includes the authentication tag.
 
-To derive a key from a password, call `derive_key(password_bytes, salt)` with a
-fresh random 16-byte salt for each new derivation context. Store the salt and
-profile with the encrypted data. The development profile uses Argon2id v19,
+To protect a new record with a password, call `generate_salt()` for a fresh
+random 16-byte salt, then call `derive_key(password_bytes, salt)`. Store the
+salt and profile with the encrypted data and reuse them when opening it.
+The development profile uses Argon2id v19,
 256 MiB, three passes, one lane, and a 32-byte output. Applications define the
 password encoding. See [Argon2id memory and concurrency](ARCHITECTURE.md#argon2id-memory-and-concurrency)
 for the memory cost and how to bound concurrent derivations.

@@ -4,14 +4,26 @@ A checksum detects a mismatch. A **signed release manifest** also binds those
 bytes to a publisher key you already trust. It does not prove that the program
 is bug-free, malware-free or the latest release.
 
-**Current status:** Verify is implemented and tested. KryptoCoreLabs has not yet
-provisioned its permanent public release-signing key or published matching
-ReleaseManifest signatures. Existing `SHA256SUMS.txt` and `RELEASE_MANIFEST.json`
-files are not automatically signed. A Mozilla-signed Firefox XPI is a separate
-mechanism. Do not treat these files as KryptoCore release signatures until the
-key and signature pairs below have actually been published.
+**Current status.** Windows app previews provide SHA-256 checksums. Verify is
+available for testing, and publisher-signed releases are pending provisioning
+of the permanent KryptoCoreLabs signing key. Firefox validates the Mozilla
+signature on the published Firefox XPI.
 
-## The short version
+## Check an available Windows preview
+
+Download the ZIP and `SHA256SUMS.txt` from the same release. In PowerShell,
+run `Get-FileHash -Algorithm SHA256 -LiteralPath .\your-download.zip` and
+compare the result to the line for that exact filename. Matching hashes confirm
+that the download matches the published digest. A trusted publisher signature
+requires an independently trusted key.
+
+When a release provides `RELEASE_MANIFEST.json`, check its source commit and
+build context as well. For example, [Rescue preview.3](https://github.com/kryptocorelabs/rescue/releases/tag/v0.1.0-preview.3)
+records its public source revision and hashes for the ZIP and EXE. The [build
+guide](BUILD.md#windows-application-builds) explains which artifacts have
+reproducibility and provenance evidence.
+
+## Check a publisher-signed release
 
 1. Obtain [KryptoCore Verify](https://github.com/kryptocorelabs/apps-source/tree/main/apps/verify)
    through a trusted route, or build it from a reviewed source revision.

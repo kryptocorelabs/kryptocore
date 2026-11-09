@@ -1,7 +1,7 @@
 import pytest
 from nacl.pwhash import argon2id
 
-from kryptocore import AuthenticationError, decrypt, derive_key, encrypt
+from kryptocore import AuthenticationError, decrypt, derive_key, encrypt, generate_salt
 
 
 def test_xchacha20_poly1305_known_answer(monkeypatch):
@@ -37,12 +37,27 @@ def test_tampering_is_rejected(field):
 
 def test_empty_message_and_fresh_nonce():
     key = bytes(32)
-    nonce, ciphertext = encrypt(key, b"")
+    nonce, ciphertext = encrypt(key, b"", aad=b"")
     assert len(nonce) == 24
-    assert nonce != encrypt(key, b"")[0]
-    assert decrypt(key, nonce, ciphertext) == b""
+    assert nonce != encrypt(key, b"", aad=b"")[0]
+    assert decrypt(key, nonce, ciphertext, aad=b"") == b""
     with pytest.raises(AuthenticationError):
-        decrypt(key, nonce, ciphertext[:-1])
+        decrypt(key, nonce, ciphertext[:-1], aad=b"")
+
+
+def test_implicit_aad_warns_and_preserves_empty_aad_compatibility():
+    key = bytes(32)
+    with pytest.warns(DeprecationWarning, match="Pass aad explicitly"):
+        nonce, ciphertext = encrypt(key, b"old format")
+    assert decrypt(key, nonce, ciphertext, aad=b"") == b"old format"
+    with pytest.warns(DeprecationWarning, match="Pass aad explicitly"):
+        assert decrypt(key, nonce, ciphertext) == b"old format"
+
+
+def test_fresh_salt():
+    salt = generate_salt()
+    assert len(salt) == 16
+    assert salt != generate_salt()
 
 
 def test_argon2id_matches_libsodium():

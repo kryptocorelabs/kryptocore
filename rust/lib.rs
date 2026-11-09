@@ -19,6 +19,15 @@ pub use context::{Context, ContextError};
 pub struct Key(Zeroizing<[u8; 32]>);
 
 impl Key {
+    /// Import 32 bytes of existing secret key material into an opaque key.
+    /// The caller retains responsibility for the source buffer. Use
+    /// [`derive_key`] for passwords and authenticate any wrapped input first.
+    pub fn from_bytes(bytes: &[u8; 32]) -> Self {
+        let mut key = Zeroizing::new([0; 32]);
+        key.copy_from_slice(bytes);
+        Self(key)
+    }
+
     /// Generate a new key using the operating system's random source.
     pub fn generate() -> Result<Self, Error> {
         let mut key = Zeroizing::new([0u8; 32]);
@@ -204,9 +213,9 @@ mod tests {
     #[test]
     fn decrypts_published_xchacha20_poly1305_vector() {
         // draft-irtf-cfrg-xchacha-03, Appendix A.1
-        let key = Key(Zeroizing::new(hex!(
+        let key = Key::from_bytes(&hex!(
             "808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9f"
-        )));
+        ));
         let nonce = hex!("404142434445464748494a4b4c4d4e4f5051525354555657");
         let aad = hex!("50515253c0c1c2c3c4c5c6c7");
         let ciphertext = hex!(

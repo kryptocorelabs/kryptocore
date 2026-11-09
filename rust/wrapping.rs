@@ -6,7 +6,6 @@ use crate::{
 };
 use std::fmt;
 use subtle::ConstantTimeEq;
-use zeroize::Zeroizing;
 
 const KEY_LABEL: &[u8] = b"KryptoCore/wrap-key\0\x01";
 const PASSWORD_LABEL: &[u8] = b"KryptoCore/wrap-password\0\x01";
@@ -102,9 +101,9 @@ fn seal(wrapping_key: &Key, key: &Key, aad: &[u8]) -> Result<WrappedKey, WrapErr
 fn open(wrapping_key: &Key, wrapped: &WrappedKey, aad: &[u8]) -> Result<Key, WrapError> {
     let plaintext = decrypt(wrapping_key, &wrapped.nonce, &wrapped.ciphertext, aad)
         .map_err(WrapError::Crypto)?;
-    let mut key = Zeroizing::new([0; 32]);
-    key.copy_from_slice(&plaintext);
-    Ok(Key(key))
+    let bytes = <&[u8; 32]>::try_from(plaintext.as_slice())
+        .map_err(|_| WrapError::Crypto(Error::AuthenticationFailed))?;
+    Ok(Key::from_bytes(bytes))
 }
 
 #[cfg(test)]
@@ -155,7 +154,7 @@ mod tests {
             unwrap_key(&kek, &wrapped, &context).err(),
             Some(AUTH_FAILED)
         );
-        let copy = Key(Zeroizing::new(*key.0));
+        let copy = Key::from_bytes(&key.0);
         assert_eq!(
             wrap_key(&copy, &key, &context).err(),
             Some(WrapError::SameKey)
@@ -192,7 +191,7 @@ mod tests {
 
     #[test]
     fn opens_independent_libsodium_vector() {
-        let key = Key(Zeroizing::new([7; 32]));
+        let key = Key::from_bytes(&[7; 32]);
         let context = Context::new("example", 1, "test", b"").unwrap();
         let wrapped = WrappedKey {
             nonce: std::array::from_fn(|i| i as u8),
