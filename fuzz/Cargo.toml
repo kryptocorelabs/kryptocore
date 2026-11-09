@@ -10,7 +10,7 @@ cargo-fuzz = true
 
 [dependencies]
 libfuzzer-sys = "0.4"
-kryptocore = { path = ".." }
+kryptocore = { path = "..", features = ["stream"] }
 
 [workspace]
 members = ["."]
@@ -18,6 +18,13 @@ members = ["."]
 [[bin]]
 name = "aead"
 path = "fuzz_targets/aead.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "stream"
+path = "fuzz_targets/stream.rs"
 test = false
 doc = false
 bench = false

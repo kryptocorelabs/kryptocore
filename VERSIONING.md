@@ -13,6 +13,10 @@ explicit identifier and preserve access to data written with older profiles
 for as long as those profiles are supported. A dependency update must still
 pass the known-answer and cross-language tests.
 
+The [Rust encryption profiles](PROFILES.md) specify their AAD and framing bytes
+independently of the package version. Preserve support for written records when
+adopting new profiles. Existing applications select their existing decoders.
+
 ## Application formats
 
 Each application owns its container format and format version. Library versions

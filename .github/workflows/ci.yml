@@ -22,7 +22,7 @@ jobs:
         with:
           persist-credentials: false
       - run: rustup toolchain install stable --profile minimal
-      - run: cargo +stable test --workspace --locked --release
+      - run: cargo +stable test --workspace --locked --release --all-features
       - name: Check Argon2id under parallel load and a process memory limit
         if: runner.os == 'Linux'
         shell: bash
@@ -92,6 +92,12 @@ jobs:
           mkdir "$corpus"
           python3 -c 'import pathlib, sys; pathlib.Path(sys.argv[1]).write_bytes(b"\x00\x80\x17\x00" + bytes(range(256)) * 128)' "$corpus/large-aad"
           cargo +nightly fuzz run aead "$corpus" -- -max_total_time=45 -max_len=65536 -rss_limit_mb=1024
+      - name: Fuzz authenticated stream framing
+        run: |
+          corpus="$RUNNER_TEMP/stream-corpus"
+          mkdir "$corpus"
+          python3 -c 'import pathlib, sys; pathlib.Path(sys.argv[1]).write_bytes(b"\x1b\x00\x01\x00" + bytes(range(256)) * 256)' "$corpus/full-record"
+          cargo +nightly fuzz run stream "$corpus" -- -max_total_time=30 -max_len=131076 -rss_limit_mb=1024
       - run: git diff --exit-code -- fuzz/Cargo.lock
 
   source-artifact:

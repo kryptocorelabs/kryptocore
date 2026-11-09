@@ -69,7 +69,7 @@ prompted by Rustup.
 git clone https://github.com/kryptocorelabs/kryptocore.git
 cd kryptocore
 cargo build --locked --release
-cargo test --workspace --locked --release
+cargo test --workspace --locked --release --all-features
 ```
 
 ### Rust
@@ -107,6 +107,11 @@ the nonce as a byte slice. A nonce with the wrong length is an input error.
 A wrong key, a changed nonce of the correct length, modified AAD and invalid
 ciphertext all return the same authentication error. The original Rust entry
 points still return `Error`. Error messages contain no input values.
+
+For new Rust integrations, `Context` encodes application, version and purpose
+as AAD. `wrapping` protects a data key with an independent key or password.
+Enable the `stream` feature for large files. See the [encryption profiles](PROFILES.md)
+for byte encodings, safe use of randomness and output staging.
 
 ### Python reference
 
@@ -167,6 +172,8 @@ With `cargo-audit` installed, run `cargo audit --deny warnings` and
 `cargo audit --file fuzz/Cargo.lock --deny warnings`. With nightly Rust and
 `cargo-fuzz` installed, run
 `cargo +nightly fuzz run aead -- -max_total_time=45 -max_len=65536 -rss_limit_mb=1024`.
+Run `cargo +nightly fuzz run stream -- -max_total_time=30 -max_len=131076 -rss_limit_mb=1024`
+to exercise stream framing and authentication.
 These checks cover known dependency advisories and exercise authenticated
 encryption and decryption. See the [security scope](SECURITY.md) for review status.
 

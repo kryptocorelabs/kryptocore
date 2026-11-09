@@ -9,6 +9,12 @@ use chacha20poly1305::{
 use std::fmt;
 use zeroize::Zeroizing;
 
+mod context;
+#[cfg(feature = "stream")]
+pub mod stream;
+pub mod wrapping;
+pub use context::{Context, ContextError};
+
 /// A secret key whose backing bytes are overwritten on drop.
 pub struct Key(Zeroizing<[u8; 32]>);
 
@@ -24,6 +30,24 @@ impl Key {
 pub type Salt = [u8; 16];
 /// A public XChaCha20-Poly1305 nonce.
 pub type Nonce = [u8; 24];
+
+/// Generate a fresh 16-byte salt for a new password derivation context.
+/// Store it with the encrypted data and reuse that stored salt when opening.
+pub fn generate_salt() -> Result<Salt, Error> {
+    random_bytes()
+}
+
+/// Generate a fresh 24-byte XChaCha20-Poly1305 nonce using OS randomness.
+/// [`encrypt`] does this internally and returns the nonce to store.
+pub fn generate_nonce() -> Result<Nonce, Error> {
+    random_bytes()
+}
+
+fn random_bytes<const N: usize>() -> Result<[u8; N], Error> {
+    let mut bytes = [0; N];
+    getrandom::fill(&mut bytes).map_err(|_| Error::RandomnessUnavailable)?;
+    Ok(bytes)
+}
 
 /// Failure of a cryptographic operation.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -108,8 +132,7 @@ pub fn derive_key_detailed(password: &[u8], salt: &Salt) -> Result<Key, KeyDeriv
 /// Encrypt a message and return a fresh nonce and the ciphertext with its tag.
 /// Associated data is authenticated and remains public.
 pub fn encrypt(key: &Key, plaintext: &[u8], aad: &[u8]) -> Result<(Nonce, Vec<u8>), Error> {
-    let mut nonce = Nonce::default();
-    getrandom::fill(&mut nonce).map_err(|_| Error::RandomnessUnavailable)?;
+    let nonce = generate_nonce()?;
     let ciphertext = XChaCha20Poly1305::new((&*key.0).into())
         .encrypt(
             (&nonce).into(),
