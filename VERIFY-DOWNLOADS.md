@@ -18,6 +18,19 @@ Confirm the key through a trusted route before using it to verify downloads.
 The Verify manifest includes an expiry. Check the validity period for the
 download you intend to use.
 
+## Signed downloads
+
+| Product | Release archives with detached signatures |
+| --- | --- |
+| Messenger | [alpha.1](https://github.com/kryptocorelabs/msg/releases/tag/v0.1.0-alpha.1), [alpha.2 preview.4](https://github.com/kryptocorelabs/msg/releases/tag/v0.1.0-alpha.2-preview.4) |
+| Container | [alpha.1](https://github.com/kryptocorelabs/container/releases/tag/v0.1.0-alpha.1), [alpha.2 preview.1](https://github.com/kryptocorelabs/container/releases/tag/v0.1.0-alpha.2-preview.1) |
+| Rescue | [preview.2](https://github.com/kryptocorelabs/rescue/releases/tag/v0.1.0-preview.2), [preview.3](https://github.com/kryptocorelabs/rescue/releases/tag/v0.1.0-preview.3) |
+| Vault for Firefox | [0.1.16 XPI](https://github.com/kryptocorelabs/vault/releases/tag/firefox-v0.1.16) |
+
+The current manifest pairs expire on 2027-02-07 at 09:56:11 UTC. The historical
+Windows Vault ZIPs provide checksums and still need a verifiable build/source
+mapping for publisher signing.
+
 ## Check an available Windows preview
 
 Download the ZIP and `SHA256SUMS.txt` from the same release. In PowerShell,
