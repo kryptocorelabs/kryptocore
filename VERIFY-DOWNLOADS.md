@@ -4,10 +4,19 @@ A checksum detects a mismatch. A **signed release manifest** also binds those
 bytes to a publisher key you already trust. It does not prove that the program
 is bug-free, malware-free or the latest release.
 
-**Current status.** Windows app previews provide SHA-256 checksums. Verify is
-available for testing, and publisher-signed releases are pending provisioning
-of the permanent KryptoCoreLabs signing key. Firefox validates the Mozilla
-signature on the published Firefox XPI.
+**Current status.** Windows app previews provide SHA-256 checksums. Signed
+downloads also provide a `.release.json` and `.release.sig` pair alongside the
+archive. Firefox validates the Mozilla signature on the published Firefox XPI.
+
+## KryptoCoreLabs publisher key
+
+The [public release key](PUBLIC_RELEASE_KEY.txt) is anchored in this repository's
+GitHub-verified commit history. The SHA-256 fingerprint of the 32 public key bytes
+encoded after `KCP1:` is
+`9c77898f06d12f234101e633c713f095d488d45a212661ac3ac06c4271dc00d8`.
+Confirm the key through a trusted route before using it to verify downloads.
+The Verify manifest includes an expiry. Check the validity period for the
+download you intend to use.
 
 ## Check an available Windows preview
 
@@ -45,14 +54,13 @@ From the folder containing Verify and the three downloaded files:
 
 ```powershell
 $KryptoReleaseArchive = 'KryptoCore-Rescue-0.1.0-preview.3-windows-x64.zip'
-$KryptoPublisherKey = 'KCP1:REPLACE_WITH_THE_FULL_TRUSTED_PUBLIC_KEY'
+$KryptoPublisherKey = (Get-Content -Raw -LiteralPath .\PUBLIC_RELEASE_KEY.txt).Trim()
 .\kryptocore-verify.exe check $KryptoReleaseArchive "$KryptoReleaseArchive.release.json" "$KryptoReleaseArchive.release.sig" --key $KryptoPublisherKey --product rescue --version 0.1.0-preview.3 --target windows-x86_64
 ```
 
-This is a command template, not a claim that the signature files already exist.
-Replace the placeholder with the complete trusted public code. For another
-download, use its exact three filenames and expected metadata. Do not choose
-the expected version merely by copying an untrusted manifest's contents.
+Place your independently verified `PUBLIC_RELEASE_KEY.txt` in the same folder.
+For another download, use its exact three filenames and expected metadata.
+Choose the expected version from the release you intended to download.
 
 On Linux/macOS, use `./kryptocore-verify` with the same arguments and ordinary
 relative paths. Target names are `linux-x86_64`, `macos-x86_64`,
