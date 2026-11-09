@@ -159,6 +159,8 @@ or ask a question in [Discussions](https://github.com/kryptocorelabs/kryptocore/
 See [API and data format versioning](VERSIONING.md) for compatibility rules.
 See the [architecture](ARCHITECTURE.md), [threat model](THREAT_MODEL.md), and
 [build and artifact verification](BUILD.md) for design and release details.
+See the [roadmap](ROADMAP.md) for product scope and the
+[test vector index](TEST-VECTORS.md) for pinned public fixtures.
 
 ### Security checks
 

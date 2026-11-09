@@ -33,6 +33,11 @@ Bug reports, tests, documentation, and code reviews are welcome. Follow the
   [versioning policy](VERSIONING.md).
 - Keep the change focused. In the pull request, describe what changed and
   which checks you ran.
+- Security-critical changes should identify the affected trust boundary and
+  include a failure case and a compatibility check. Use the versioned
+  [test vector index](TEST-VECTORS.md) when reporting a regression.
+- External review notes can go in the public issue for the relevant product.
+  Send suspected vulnerabilities through the private route in [SECURITY.md](SECURITY.md).
 
 ## Run the tests
 

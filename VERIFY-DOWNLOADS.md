@@ -15,6 +15,8 @@ GitHub-verified commit history. The SHA-256 fingerprint of the 32 public key byt
 encoded after `KCP1:` is
 `9c77898f06d12f234101e633c713f095d488d45a212661ac3ac06c4271dc00d8`.
 Confirm the key through a trusted route before using it to verify downloads.
+See the [release key procedure](RELEASE-KEY-PROCESS.md) for key creation,
+backup and replacement after suspected compromise.
 The Verify manifest includes an expiry. Check the validity period for the
 download you intend to use.
 

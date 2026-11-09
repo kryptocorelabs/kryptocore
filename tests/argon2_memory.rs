@@ -8,6 +8,9 @@ const SALT: [u8; 16] = [42; 16];
 #[test]
 #[ignore = "uses 512 MiB for two concurrent Argon2id work buffers"]
 fn argon2id_derives_keys_concurrently() {
+    let other_salt = [43; 16];
+    let expected_first = derive_key(PASSWORD, &SALT).unwrap();
+    let expected_second = derive_key(PASSWORD, &other_salt).unwrap();
     let start = Barrier::new(2);
     let (first, second) = thread::scope(|scope| {
         let worker = scope.spawn(|| {
@@ -15,13 +18,24 @@ fn argon2id_derives_keys_concurrently() {
             derive_key(PASSWORD, &SALT).unwrap()
         });
         start.wait();
-        let second = derive_key_detailed(PASSWORD, &SALT).unwrap();
+        let second = derive_key_detailed(PASSWORD, &other_salt).unwrap();
         (worker.join().unwrap(), second)
     });
 
-    let (nonce, ciphertext) = encrypt(&first, b"memory check", b"test/v1").unwrap();
-    let plaintext = decrypt(&second, &nonce, &ciphertext, b"test/v1").unwrap();
-    assert_eq!(&plaintext[..], b"memory check");
+    let context = b"test/v1";
+    let message = b"memory check";
+    for (actual, expected, wrong) in [
+        (&first, &expected_first, &expected_second),
+        (&second, &expected_second, &expected_first),
+    ] {
+        let (nonce, ciphertext) = encrypt(actual, message, context).unwrap();
+        let plaintext = decrypt(expected, &nonce, &ciphertext, context).unwrap();
+        assert_eq!(&plaintext[..], message);
+        assert!(matches!(
+            decrypt(wrong, &nonce, &ciphertext, context),
+            Err(Error::AuthenticationFailed)
+        ));
+    }
 }
 
 #[test]
