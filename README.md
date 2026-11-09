@@ -1,5 +1,14 @@
 # KryptoCore
 
+KryptoCore is an open-source Rust library for developers building apps that
+encrypt data locally. It provides authenticated encryption and password-based
+key derivation behind a small API.
+
+**Development preview.** Use test data and review the [threat model](THREAT_MODEL.md)
+before integration. An independent security audit is pending.
+
+[Try Vault, our local password manager](https://github.com/kryptocorelabs/vault#try-the-desktop-preview) · [Get started with the library](#quick-start) · [Give feedback](https://github.com/kryptocorelabs/kryptocore/discussions)
+
 [Security in 30 seconds](SECURITY-IN-BRIEF.md) · [Recover without the main app](RESCUE-FIRST.md) · [Check a download](VERIFY-DOWNLOADS.md)
 
 <img src="branding/kryptocore.png" alt="KryptoCore emblem" width="112">
@@ -8,27 +17,16 @@
 [![Rust dependency licenses](https://github.com/kryptocorelabs/kryptocore/actions/workflows/licenses.yml/badge.svg?branch=main)](https://github.com/kryptocorelabs/kryptocore/actions/workflows/licenses.yml)
 [MIT License](LICENSE) · [Security](SECURITY.md) · [Contribute](CONTRIBUTING.md) · [Discussions](https://github.com/kryptocorelabs/kryptocore/discussions)
 
-KryptoCore is a small, community-developed Rust library for local authenticated
-encryption and password-based key derivation. Anyone can use, study, and
-improve it under the MIT license, or build an application on top of it.
+Anyone can use, study and improve KryptoCore under the MIT license.
 
 - Encrypt and authenticate data with XChaCha20-Poly1305.
 - Derive encryption keys from passwords with Argon2id.
 - Check Rust and Python interoperability with the included reference implementation.
 
-KryptoCore is a development preview. Independent security review is pending.
-Use synthetic data for evaluation and read the [threat model](THREAT_MODEL.md)
-before integrating it into an application.
-
-[KryptoCore Vault](https://github.com/kryptocorelabs/vault) is a local password
-manager built on the library. Its desktop downloads and Firefox integration
-updates are managed separately.
-
 Testing to date has been carried out by the KryptoCoreLabs maintainers, locally
-and through automated CI. No independent security audit has been completed.
-We welcome community testing, code reviews and scrutiny of our security
-assumptions. Please use synthetic data and report suspected vulnerabilities
-privately through the project's security-reporting channel.
+and through automated CI. We welcome community testing, code reviews and
+scrutiny of our security assumptions. Report suspected vulnerabilities privately
+through the project's [security-reporting channel](SECURITY.md).
 
 ## Optional signatures
 
