@@ -1,11 +1,13 @@
 #![forbid(unsafe_code)]
-//! Local authenticated encryption and password-based key derivation.
+//! Local authenticated encryption and key derivation.
 
 use argon2::{Algorithm, Argon2, Block, Params, Version};
 use chacha20poly1305::{
     aead::{Aead, KeyInit, Payload},
     XChaCha20Poly1305,
 };
+use hkdf::Hkdf;
+use sha2::Sha256;
 use std::fmt;
 use zeroize::Zeroizing;
 
@@ -33,6 +35,17 @@ impl Key {
         let mut key = Zeroizing::new([0u8; 32]);
         getrandom::fill(&mut key[..]).map_err(|_| Error::RandomnessUnavailable)?;
         Ok(Self(key))
+    }
+
+    /// Derive an independent 32-byte key from an existing secret key using HKDF-SHA-256.
+    /// Use a distinct application, version or purpose for each key usage. The same
+    /// parent and context always produce the same key. Use [`derive_key`] for passwords.
+    pub fn derive_subkey(&self, context: &Context) -> Self {
+        let hkdf = Hkdf::<Sha256>::new(Some(b"KryptoCore/HKDF-SHA256\0\x01"), &self.0[..]);
+        let mut key = Zeroizing::new([0; 32]);
+        hkdf.expand(context.as_bytes(), &mut key[..])
+            .expect("32 bytes is a valid HKDF-SHA-256 output length");
+        Self(key)
     }
 }
 /// A public, random salt for the password derivation profile.
@@ -209,6 +222,28 @@ pub fn decrypt_checked(
 mod tests {
     use super::*;
     use hex_literal::hex;
+
+    #[test]
+    fn hkdf_subkeys_match_the_profile_and_separate_contexts() {
+        let key = Key::from_bytes(&std::array::from_fn(|index| index as u8));
+        let context = Context::new("example", 1, "book", b"").unwrap();
+        let subkey = key.derive_subkey(&context);
+        // HKDF-Extract and HKDF-Expand computed independently with Python HMAC.
+        assert_eq!(
+            *subkey.0,
+            hex!("880422dae0fa33643b47cf26cc0bfe38b71b4789db63b4248c3f04bca36c5150")
+        );
+        assert_ne!(*subkey.0, *key.0);
+        for (application, version, purpose, metadata) in [
+            ("other", 1, "book", b"".as_slice()),
+            ("example", 2, "book", b""),
+            ("example", 1, "policy", b""),
+            ("example", 1, "book", b"other"),
+        ] {
+            let other = Context::new(application, version, purpose, metadata).unwrap();
+            assert_ne!(*subkey.0, *key.derive_subkey(&other).0);
+        }
+    }
 
     #[test]
     fn decrypts_published_xchacha20_poly1305_vector() {

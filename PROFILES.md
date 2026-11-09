@@ -28,6 +28,15 @@ byte concatenation. Both labels are 1 to 255 ASCII bytes from `[a-z0-9._-]`, the
 version is nonzero, and the metadata is at most 64 KiB. If metadata has several
 fields, the application must encode them unambiguously.
 
+## Subkeys from an existing key
+
+`Key::derive_subkey` uses [HKDF-SHA-256](https://www.rfc-editor.org/rfc/rfc5869)
+with the fixed salt `b"KryptoCore/HKDF-SHA256\0\x01"`, the 32-byte parent key
+as input key material, `Context::as_bytes()` as `info`, and a 32-byte output.
+Choose a separate application, version or purpose for each use. Keep the
+same context when reopening data. This is for high-entropy key material.
+Use Argon2id for passwords.
+
 ## Key wrapping
 
 Generate a random data key and use an independent wrapping key or a strong

@@ -96,6 +96,8 @@ fn main() -> Result<(), kryptocore::Error> {
 
 Use `Key::generate()` for a new key or `Key::from_bytes(&[u8; 32])` to import
 existing secret key material. Use `generate_salt()` for a new password derivation.
+Use `Key::derive_subkey(&Context)` to derive a separate purpose-specific key
+from an existing high-entropy key. Passwords use Argon2id through `derive_key`.
 The library overwrites its owned key and plaintext buffers and the Argon2 work
 buffer on drop. The caller manages passwords, original key bytes and other copies.
 
