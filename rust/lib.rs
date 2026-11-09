@@ -6,6 +6,7 @@ use chacha20poly1305::{
     aead::{Aead, KeyInit, Payload},
     XChaCha20Poly1305,
 };
+use std::fmt;
 use zeroize::Zeroizing;
 
 /// A secret key whose backing bytes are overwritten on drop.
@@ -34,24 +35,73 @@ pub enum Error {
     AuthenticationFailed,
 }
 
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(match self {
+            Self::EmptyPassword => "Password is empty.",
+            Self::DerivationFailed => "Key derivation failed.",
+            Self::RandomnessUnavailable => "Operating system randomness is unavailable.",
+            Self::EncryptionFailed => "Encryption failed.",
+            Self::AuthenticationFailed => "Ciphertext authentication failed.",
+        })
+    }
+}
+
+impl std::error::Error for Error {}
+
+/// Actionable failures for callers that want to handle key derivation errors.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[non_exhaustive]
+pub enum KeyDerivationError {
+    EmptyPassword,
+    PasswordTooLong,
+    MemoryUnavailable,
+    DerivationFailed,
+}
+
+impl fmt::Display for KeyDerivationError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(match self {
+            Self::EmptyPassword => "Password is empty.",
+            Self::PasswordTooLong => "Password exceeds the supported length.",
+            Self::MemoryUnavailable => "Key derivation could not reserve its work memory.",
+            Self::DerivationFailed => "Key derivation failed.",
+        })
+    }
+}
+
+impl std::error::Error for KeyDerivationError {}
+
 /// Derive a key using Argon2id v19 with 256 MiB, three passes and one lane.
 /// The caller supplies a fresh random salt for each new derivation context
 /// and bounds the number of concurrent derivations.
 /// Returns [`Error::DerivationFailed`] if the allocator rejects the work buffer reservation.
 pub fn derive_key(password: &[u8], salt: &Salt) -> Result<Key, Error> {
+    derive_key_detailed(password, salt).map_err(|error| match error {
+        KeyDerivationError::EmptyPassword => Error::EmptyPassword,
+        _ => Error::DerivationFailed,
+    })
+}
+
+/// Derive the same key as [`derive_key`], with separate input and memory errors.
+pub fn derive_key_detailed(password: &[u8], salt: &Salt) -> Result<Key, KeyDerivationError> {
     if password.is_empty() {
-        return Err(Error::EmptyPassword);
+        return Err(KeyDerivationError::EmptyPassword);
     }
-    let params = Params::new(256 * 1024, 3, 1, Some(32)).map_err(|_| Error::DerivationFailed)?;
+    if password.len() > argon2::MAX_PWD_LEN {
+        return Err(KeyDerivationError::PasswordTooLong);
+    }
+    let params = Params::new(256 * 1024, 3, 1, Some(32))
+        .map_err(|_| KeyDerivationError::DerivationFailed)?;
     let mut memory = Zeroizing::new(Vec::new());
     memory
         .try_reserve_exact(params.block_count())
-        .map_err(|_| Error::DerivationFailed)?;
+        .map_err(|_| KeyDerivationError::MemoryUnavailable)?;
     memory.resize(params.block_count(), Block::default());
     let mut key = Zeroizing::new([0u8; 32]);
     Argon2::new(Algorithm::Argon2id, Version::V0x13, params)
         .hash_password_into_with_memory(password, salt, &mut key[..], &mut memory[..])
-        .map_err(|_| Error::DerivationFailed)?;
+        .map_err(|_| KeyDerivationError::DerivationFailed)?;
     Ok(Key(key))
 }
 
@@ -89,6 +139,38 @@ pub fn decrypt(
         )
         .map(Zeroizing::new)
         .map_err(|_| Error::AuthenticationFailed)
+}
+
+/// Input shape or authentication errors for a nonce received as bytes.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[non_exhaustive]
+pub enum DecryptError {
+    InvalidNonceLength,
+    AuthenticationFailed,
+}
+
+impl fmt::Display for DecryptError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::InvalidNonceLength => f.write_str("Nonce must be exactly 24 bytes."),
+            Self::AuthenticationFailed => fmt::Display::fmt(&Error::AuthenticationFailed, f),
+        }
+    }
+}
+
+impl std::error::Error for DecryptError {}
+
+/// Check a raw nonce's length, then authenticate exactly as [`decrypt`] does.
+/// Wrong keys, wrong values in a well-sized nonce, wrong AAD and damaged
+/// ciphertext all return the same authentication error.
+pub fn decrypt_checked(
+    key: &Key,
+    nonce: &[u8],
+    ciphertext: &[u8],
+    aad: &[u8],
+) -> Result<Zeroizing<Vec<u8>>, DecryptError> {
+    let nonce = <&Nonce>::try_from(nonce).map_err(|_| DecryptError::InvalidNonceLength)?;
+    decrypt(key, nonce, ciphertext, aad).map_err(|_| DecryptError::AuthenticationFailed)
 }
 
 #[cfg(test)]
@@ -142,7 +224,15 @@ mod tests {
                 decrypt(key, nonce, data, aad),
                 Err(Error::AuthenticationFailed)
             ));
+            assert!(matches!(
+                decrypt_checked(key, nonce, data, aad),
+                Err(DecryptError::AuthenticationFailed)
+            ));
         }
+        assert!(matches!(
+            decrypt_checked(&key, &nonce[..23], &ciphertext, b"vault/v1"),
+            Err(DecryptError::InvalidNonceLength)
+        ));
     }
 
     #[test]
@@ -162,5 +252,9 @@ mod tests {
             hex!("d2250c8b3ccc488a296fc8d6875c6a9a2cf6e838c79c14b714e3945ba46f8e3c")
         );
         assert!(matches!(derive_key(b"", &salt), Err(Error::EmptyPassword)));
+        assert!(matches!(
+            derive_key_detailed(b"", &salt),
+            Err(KeyDerivationError::EmptyPassword)
+        ));
     }
 }

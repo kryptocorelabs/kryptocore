@@ -1,6 +1,6 @@
 use std::{sync::Barrier, thread};
 
-use kryptocore::{decrypt, derive_key, encrypt, Error};
+use kryptocore::{decrypt, derive_key, derive_key_detailed, encrypt, Error, KeyDerivationError};
 
 const PASSWORD: &[u8] = b"synthetic password for memory tests";
 const SALT: [u8; 16] = [42; 16];
@@ -15,7 +15,7 @@ fn argon2id_derives_keys_concurrently() {
             derive_key(PASSWORD, &SALT).unwrap()
         });
         start.wait();
-        let second = derive_key(PASSWORD, &SALT).unwrap();
+        let second = derive_key_detailed(PASSWORD, &SALT).unwrap();
         (worker.join().unwrap(), second)
     });
 
@@ -27,6 +27,10 @@ fn argon2id_derives_keys_concurrently() {
 #[test]
 #[ignore = "run the compiled test with a process memory limit below 256 MiB"]
 fn argon2id_reports_reservation_failure() {
+    assert!(matches!(
+        derive_key_detailed(PASSWORD, &SALT),
+        Err(KeyDerivationError::MemoryUnavailable)
+    ));
     assert!(matches!(
         derive_key(PASSWORD, &SALT),
         Err(Error::DerivationFailed)

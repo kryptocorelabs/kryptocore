@@ -23,12 +23,37 @@ Use the same Git and gzip versions when comparing builds. CI stores the archive,
 checksum and source record together on the workflow run. The source artifact
 contains tracked Core files only.
 
-## Binary release preparation
+## Rebuild and verify the Linux Core library
 
-Before publishing a binary or wheel, record the commit, target, complete
-toolchain versions, runner or image identity, lockfile digests, build command
-and SHA-256 for each asset. Build twice in independent clean environments and
-compare the binary digests before describing the binaries as reproducible.
-Rust uses `cargo build --locked --release`. Python packaging needs a separately
-fixed build environment. The source archive check does not establish binary
-reproducibility. Vault release provenance is tracked separately from the Core.
+On x86-64 Ubuntu 24.04, use a clean checkout of the commit recorded in
+`SOURCE.txt`. Match the Git and gzip versions in that file and install Rust
+1.99.1 with Rustup. Run:
+
+```sh
+rustup toolchain install 1.99.1 --profile minimal
+bash scripts/build-core.sh
+(cd dist/source && sha256sum -c SHA256SUMS.txt)
+```
+
+The build uses the checked-in Cargo lockfile and remaps checkout and registry
+paths. Two independent CI jobs build the commit. The comparison job checks
+each checksum file and compares the source archives and
+`libkryptocore.rlib` byte for byte. Download the `core-verified-<commit>`
+artifact from the same workflow run. It includes the checked outputs,
+`SOURCE.txt`, `RUSTC.txt` and `SHA256SUMS.txt`.
+
+The successful main-branch push and manual workflows attach signed GitHub
+build provenance to each of those two outputs. Check it with the GitHub CLI:
+
+```sh
+gh attestation verify libkryptocore.rlib --repo kryptocorelabs/kryptocore
+gh attestation verify kryptocore-COMMIT.tar.gz --repo kryptocorelabs/kryptocore
+```
+
+Replace `COMMIT` with the full commit from `SOURCE.txt`.
+This build recipe covers the Core source archive and the
+`x86_64-unknown-linux-gnu` Rust library. Windows and macOS run functional
+tests. Python wheels and desktop distributions have separate build
+environments. Publisher-signed release manifests and platform code signing
+are separate release steps. See [Verify downloads](VERIFY-DOWNLOADS.md) and
+[GitHub artifact attestations](https://docs.github.com/en/actions/how-tos/secure-your-work/use-artifact-attestations/use-artifact-attestations).

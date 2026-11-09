@@ -101,6 +101,13 @@ Keep ownership of passwords and salts in the application. The library overwrites
 its returned key and plaintext buffers and the Argon2 work buffer on drop.
 Applications should handle copies, input buffers, and process memory separately.
 
+Use `derive_key_detailed` to distinguish rejected input from failure to
+reserve the Argon2 work buffer. Use `decrypt_checked` when a parser supplies
+the nonce as a byte slice. A nonce with the wrong length is an input error.
+A wrong key, a changed nonce of the correct length, modified AAD and invalid
+ciphertext all return the same authentication error. The original Rust entry
+points still return `Error`. Error messages contain no input values.
+
 ### Python reference
 
 Use Python 3.9 or later. See the [contribution guide](CONTRIBUTING.md#run-the-tests)
@@ -151,11 +158,15 @@ With the Python reference installed, run the cross-language tests using
 `cargo test --locked --release -p kryptocore --test interop -- --ignored`.
 Set `PYTHON` to the interpreter path if the command is `python3` on your system.
 CI also runs the Rust and Python suites on Windows, Linux and macOS.
+The interop matrix includes empty and binary messages, empty and 128 KiB AAD,
+invalid nonce lengths and modified or truncated tags. The Linux CI also runs
+concurrent Argon2 derivations and exercises both Rust error APIs under a
+process memory limit.
 
 With `cargo-audit` installed, run `cargo audit --deny warnings` and
 `cargo audit --file fuzz/Cargo.lock --deny warnings`. With nightly Rust and
 `cargo-fuzz` installed, run
-`cargo +nightly fuzz run aead -- -max_total_time=45 -max_len=4096`.
+`cargo +nightly fuzz run aead -- -max_total_time=45 -max_len=65536 -rss_limit_mb=1024`.
 These checks cover known dependency advisories and exercise authenticated
 encryption and decryption. See the [security scope](SECURITY.md) for review status.
 

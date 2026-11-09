@@ -33,8 +33,10 @@ leave room for other allocations. For a desktop unlock flow, start with one
 derivation at a time. For a service, bound the queue as well as the worker
 count and reject excess work before starting a derivation.
 
-The Rust API returns `Error::DerivationFailed` if the allocator rejects the
-reservation. Some operating systems can accept the reservation and run out of
+The Rust API returns `KeyDerivationError::MemoryUnavailable` from
+`derive_key_detailed` if the allocator rejects the reservation.
+`derive_key` maps that condition to `Error::DerivationFailed`. Some operating
+systems can accept the reservation and run out of
 memory when the pages are written. Concurrency limits remain necessary in
 those environments. The Linux CI runs a parallel derivation test and checks
 that a process with a 192 MiB virtual memory limit returns the error.
