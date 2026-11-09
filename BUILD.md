@@ -64,13 +64,20 @@ Desktop applications use their own packaging recipes. See [Vault's Windows
 build](https://github.com/kryptocorelabs/vault-source/blob/main/apps/vault/WINDOWS-ONEFILE.md)
 and the [shared application builds](https://github.com/kryptocorelabs/apps-source/blob/main/apps/desktop/README.md).
 The reproducibility result above covers the Linux Core library and Core source
-archive. For a Windows preview, use its release-specific evidence. Rescue
-preview.3, for example, records a local Windows build and a public source commit
-with ZIP and EXE hashes. Independent Windows binary reproduction is pending.
+archive. The Windows workflows now build standalone executables on two
+separate Windows runners from the same public commit, compare their bytes,
+and attest the matching executables.
+See the [Vault build](https://github.com/kryptocorelabs/vault-source/actions/runs/42637952534)
+and the [Messenger, Container and Rescue build](https://github.com/kryptocorelabs/apps-source/actions/runs/42637950609).
 
-To establish reproducibility for a future Windows release, build its package
-twice from a clean public commit with pinned inputs and compare the exact bytes.
-Publish the commit, toolchain, packaging recipe and artifact hashes with the
-release. Workflow provenance, publisher-signed manifests and Authenticode each
-add a separate check. Publisher signing requires a provisioned signing key and
-a published trusted public key.
+Each run provides the matching EXEs, both build records and SHA-256 digests.
+Verify an EXE with `gh attestation verify` using its source repository,
+the `windows-provenance.yml` signer workflow and the expected commit from the
+run as `--source-digest`.
+See the [GitHub CLI options](https://cli.github.com/manual/gh_attestation_verify).
+
+For a previously published Windows preview, use its own release evidence.
+Rescue preview.3 records its local Windows build and a public source commit with ZIP and EXE
+hashes. A future release can carry forward the CI evidence by distributing the
+same EXE bytes and linking its build run. Publish the ZIP digest and its
+publisher signature separately. Windows Authenticode is a separate check.
