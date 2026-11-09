@@ -22,3 +22,16 @@ rollback protection, a defense against a compromised operating system, or
 side-channel guarantees for every deployment. See [architecture](ARCHITECTURE.md)
 for application boundaries, [encryption profiles](PROFILES.md) for usage, and
 the [security policy](SECURITY.md) for reporting.
+
+## Dependencies and alternatives
+
+| Dependency | Why we use it | Possible alternative and trade-off |
+| --- | --- | --- |
+| RustCrypto `argon2` and `chacha20poly1305` | Implement the documented password derivation and authenticated encryption profiles. The optional stream profile also uses RustCrypto's STREAM implementation. | A compatible provider could use libargon2 and libsodium primitives. A switch would add a native dependency and require byte-for-byte tests of the fixed parameters, AAD, ciphertexts and stream framing. |
+| Operating system randomness through `getrandom` | Supplies entropy for keys, salts and nonces. Randomness failure stops the operation. | Call a platform CSPRNG through a reviewed backend. This changes the adapter while retaining the platform's entropy and availability assumptions. |
+| `subtle` and `zeroize` | Provide a constant-time key equality check and clear selected Rust-owned buffers. | Equivalent reviewed helpers from a replacement provider would need to preserve those properties. The application still owns other copies and OS-managed memory. |
+| GitHub Actions and artifact attestations | Run CI and bind the published Core build artifacts to a repository and workflow identity. | Run the locked build recipe independently. A different CI or attestation service would need its own documented trust root and verification path. |
+
+Application-specific dependencies are documented at their own boundaries.
+See [Messenger transport](https://github.com/kryptocorelabs/apps-source/blob/main/apps/msg/README.md#security-boundaries)
+and the [Vault and Firefox threat model](https://github.com/kryptocorelabs/vault-source/blob/main/apps/vault/THREAT_MODEL.md).
