@@ -26,7 +26,7 @@ download you intend to use.
 | --- | --- |
 | Messenger | [alpha.1](https://github.com/kryptocorelabs/msg/releases/tag/v0.1.0-alpha.1), [alpha.2 preview.4](https://github.com/kryptocorelabs/msg/releases/tag/v0.1.0-alpha.2-preview.4) |
 | Container | [alpha.1](https://github.com/kryptocorelabs/container/releases/tag/v0.1.0-alpha.1), [alpha.2 preview.1](https://github.com/kryptocorelabs/container/releases/tag/v0.1.0-alpha.2-preview.1) |
-| Rescue | [preview.2](https://github.com/kryptocorelabs/rescue/releases/tag/v0.1.0-preview.2), [preview.3](https://github.com/kryptocorelabs/rescue/releases/tag/v0.1.0-preview.3) |
+| Rescue | [preview.2](https://github.com/kryptocorelabs/rescue/releases/tag/v0.1.0-preview.2), [preview.3](https://github.com/kryptocorelabs/rescue/releases/tag/v0.1.0-preview.3), [preview.4](https://github.com/kryptocorelabs/rescue/releases/tag/v0.1.0-preview.4) |
 | Vault for Windows | [preview.4](https://github.com/kryptocorelabs/vault/releases/tag/v0.1.0-preview.4) |
 | Vault for Firefox | [0.1.16 XPI](https://github.com/kryptocorelabs/vault/releases/tag/firefox-v0.1.16) |
 
@@ -69,9 +69,9 @@ reproducibility and provenance evidence.
 From the folder containing Verify and the three downloaded files:
 
 ```powershell
-$KryptoReleaseArchive = 'KryptoCore-Rescue-0.1.0-preview.3-windows-x64.zip'
+$KryptoReleaseArchive = 'KryptoCore-Rescue-0.1.0-preview.4-windows-x64.zip'
 $KryptoPublisherKey = (Get-Content -Raw -LiteralPath .\PUBLIC_RELEASE_KEY.txt).Trim()
-.\kryptocore-verify.exe check $KryptoReleaseArchive "$KryptoReleaseArchive.release.json" "$KryptoReleaseArchive.release.sig" --key $KryptoPublisherKey --product rescue --version 0.1.0-preview.3 --target windows-x86_64
+.\kryptocore-verify.exe check $KryptoReleaseArchive "$KryptoReleaseArchive.release.json" "$KryptoReleaseArchive.release.sig" --key $KryptoPublisherKey --product rescue --version 0.1.0-preview.4 --target windows-x86_64
 ```
 
 Place your independently verified `PUBLIC_RELEASE_KEY.txt` in the same folder.

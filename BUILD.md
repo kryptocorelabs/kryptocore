@@ -78,6 +78,8 @@ See the [GitHub CLI options](https://cli.github.com/manual/gh_attestation_verify
 
 For a previously published Windows preview, use its own release evidence.
 Rescue preview.3 records its local Windows build and a public source commit with ZIP and EXE
-hashes. A future release can carry forward the CI evidence by distributing the
-same EXE bytes and linking its build run. Publish the ZIP digest and its
-publisher signature separately. Windows Authenticode is a separate check.
+hashes. [Rescue preview.4](https://github.com/kryptocorelabs/rescue/releases/tag/v0.1.0-preview.4)
+distributes the exact ZIP from its [independent Windows builds](https://github.com/kryptocorelabs/apps-source/actions/runs/42690317991).
+The workflow compared the ZIP and its embedded EXE and attested both. The
+release includes the records, hashes and detached publisher signature.
+Windows Authenticode requires separate signing access and verification.
