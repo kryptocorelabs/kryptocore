@@ -87,8 +87,14 @@ pub fn encrypt_stream(
 }
 
 /// Authenticate records through EOF, including a mandatory final record.
-/// A valid plaintext prefix can be written before a later failure. Use private
-/// staging and make plaintext available only after success and a successful flush.
+///
+/// # Output on error
+///
+/// The writer can already contain authenticated plaintext records when this
+/// returns an error, including when the final record is missing. Use a private
+/// staging writer that readers cannot access. Publish only after this function
+/// returns `Ok(())` and the writer has been flushed successfully. Discard staging
+/// on any error. This function neither flushes the writer nor rolls it back.
 pub fn decrypt_stream(
     key: &Key,
     input: &mut impl Read,

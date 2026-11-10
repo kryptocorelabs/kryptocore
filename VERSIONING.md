@@ -8,9 +8,16 @@ release notes with migration steps. Patch releases keep supported calls and
 their results compatible. From `1.0`, incompatible API changes require a major
 version. Test fixtures and fuzz targets are internal tooling.
 
-The Python reference deprecates omitting `aad` in `encrypt` and `decrypt`.
-Pass the existing format's exact AAD bytes explicitly, including `aad=b""`
-for formats that use empty AAD. This migration preserves ciphertext compatibility.
+The original `kryptocore::Error` and `kryptocore_signatures::Error` enums are
+exhaustive in the `0.1` line. Callers can match the variants they handle and use
+an `_` arm for the rest. Adding `#[non_exhaustive]` to either enum requires a
+new minor version because downstream exhaustive matches would stop compiling.
+
+The Python reference emits a `FutureWarning` when `encrypt` or `decrypt`
+uses the deprecated empty AAD fallback after omission or `aad=None`. Pass the
+existing format's exact AAD bytes explicitly, including `aad=b""` for formats
+that use empty AAD. This preserves ciphertext compatibility when a breaking API
+release removes the fallback.
 
 The existing Argon2id profile is fixed for this API. New profiles must have an
 explicit identifier and preserve access to data written with older profiles

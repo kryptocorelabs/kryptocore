@@ -35,6 +35,7 @@ def test_tampering_is_rejected(field):
         decrypt(**args)
 
 
+@pytest.mark.filterwarnings("error::FutureWarning")
 def test_empty_message_and_fresh_nonce():
     key = bytes(32)
     nonce, ciphertext = encrypt(key, b"", aad=b"")
@@ -45,13 +46,14 @@ def test_empty_message_and_fresh_nonce():
         decrypt(key, nonce, ciphertext[:-1], aad=b"")
 
 
-def test_implicit_aad_warns_and_preserves_empty_aad_compatibility():
+@pytest.mark.parametrize("arguments", [{}, {"aad": None}], ids=["omitted", "none"])
+def test_implicit_aad_warns_and_preserves_empty_aad_compatibility(arguments):
     key = bytes(32)
-    with pytest.warns(DeprecationWarning, match="Pass aad explicitly"):
-        nonce, ciphertext = encrypt(key, b"old format")
+    with pytest.warns(FutureWarning, match="Pass aad explicitly"):
+        nonce, ciphertext = encrypt(key, b"old format", **arguments)
     assert decrypt(key, nonce, ciphertext, aad=b"") == b"old format"
-    with pytest.warns(DeprecationWarning, match="Pass aad explicitly"):
-        assert decrypt(key, nonce, ciphertext) == b"old format"
+    with pytest.warns(FutureWarning, match="Pass aad explicitly"):
+        assert decrypt(key, nonce, ciphertext, **arguments) == b"old format"
 
 
 def test_fresh_salt():

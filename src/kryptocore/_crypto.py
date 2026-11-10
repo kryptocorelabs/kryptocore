@@ -44,7 +44,7 @@ def _explicit_aad(aad: Optional[bytes]) -> bytes:
         return aad
     warnings.warn(
         "Pass aad explicitly. Use aad=b'' when the format specifies empty AAD.",
-        DeprecationWarning,
+        FutureWarning,
         stacklevel=3,
     )
     return b""

@@ -25,8 +25,12 @@ the same key. These helpers use OS randomness and return an error if it fails.
 Context encoding is `b"KryptoCore/AAD\0\x01" || u8(app_len) || app ||
 u32_be(version) || u8(purpose_len) || purpose || metadata`, where `||` means
 byte concatenation. Both labels are 1 to 255 ASCII bytes from `[a-z0-9._-]`, the
-version is nonzero, and the metadata is at most 64 KiB. If metadata has several
-fields, the application must encode them unambiguously.
+version is nonzero, and the metadata is at most 64 KiB. Metadata occupies the
+entire tail. A context with metadata `b"ab"` has the same bytes as a context
+with metadata `b"a"` followed by an unframed `b"b"`. Encode multiple metadata
+fields using fixed widths or explicit lengths. If an outer format places fields
+after `Context::as_bytes()`, length-prefix the complete context and frame the
+remaining fields unambiguously.
 
 ## Subkeys from an existing key
 
@@ -87,6 +91,35 @@ Discard staging on error. On decryption, an authentic prefix may already have
 been written when a later record fails. Preserve the source and any existing
 destination until the full stream is verified. The application controls
 temporary file permissions and atomic replacement.
+
+For example, an application using `tempfile` can create a new destination as
+follows. Its parent directory must be private and under the user's control.
+In particular, a temporary file created in a shared Windows directory can
+inherit access rules that let others read it.
+
+```rust
+use kryptocore::{stream::decrypt_stream, Context, Key};
+use std::{io::Read, path::Path};
+
+fn decrypt_to_new_file(
+    key: &Key,
+    ciphertext: &mut impl Read,
+    context: &Context,
+    destination: &Path,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let parent = destination.parent()
+        .filter(|path| !path.as_os_str().is_empty())
+        .unwrap_or_else(|| Path::new("."));
+    let mut staged = tempfile::NamedTempFile::new_in(parent)?;
+    decrypt_stream(key, ciphertext, staged.as_file_mut(), context)?;
+    staged.as_file().sync_all()?;
+    staged.persist_noclobber(destination)?;
+    Ok(())
+}
+```
+
+If decryption or sync fails, dropping the temporary file attempts to remove
+it. A crash or failed cleanup can leave plaintext in the staging directory.
 
 The stream v1 header is `b"KCSSTRM\x01" || random_19_byte_nonce_prefix`.
 Records use RustCrypto STREAM-BE32 with XChaCha20-Poly1305. Each nonce is the

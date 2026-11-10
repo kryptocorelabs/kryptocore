@@ -58,7 +58,11 @@ impl Context {
         Ok(Self(aad))
     }
 
-    /// The public bytes to pass to ordinary `encrypt` and `decrypt`.
+    /// The complete public AAD bytes for ordinary `encrypt` and `decrypt`.
+    ///
+    /// Metadata occupies the entire tail of this encoding. Encode metadata
+    /// fields with fixed widths or explicit lengths. If these bytes are followed
+    /// by other fields in an outer format, frame the entire context first.
     pub fn as_bytes(&self) -> &[u8] {
         &self.0
     }

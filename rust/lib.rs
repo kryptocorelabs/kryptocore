@@ -72,6 +72,8 @@ fn random_bytes<const N: usize>() -> Result<[u8; N], Error> {
 }
 
 /// Failure of a cryptographic operation.
+///
+/// For forward compatibility, include a fallback arm when matching variants.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Error {
     EmptyPassword,

@@ -74,7 +74,9 @@ cargo test --workspace --locked --release --all-features
 
 The preview is distributed through GitHub. Add it as a Git dependency in
 your application's `Cargo.toml` and pin a full commit you have reviewed.
-Crates.io publication is disabled during the preview (`publish = false`).
+Both `kryptocore` and the optional `kryptocore-signatures` crate disable
+registry publication during the preview (`publish = false`). The same Git
+revision can pin both crates.
 
 ```toml
 [dependencies]
@@ -135,7 +137,8 @@ assert decrypt(key, nonce, ciphertext, aad=b"example/v1") == b"hello"
 Keep the key secret. Store the nonce alongside the ciphertext. Associated data
 is authenticated and remains public. Supply exactly the same bytes when decrypting.
 Pass `aad` explicitly for every call. Use `aad=b""` when the format specifies
-empty AAD. Omitting it still uses empty AAD and emits a `DeprecationWarning`.
+empty AAD. Omitting it or passing `None` still uses empty AAD and emits a
+`FutureWarning`, which Python displays with its default warning filters.
 If authentication fails, `decrypt` raises `AuthenticationError` for well-formed
 inputs. The ciphertext includes the authentication tag.
 

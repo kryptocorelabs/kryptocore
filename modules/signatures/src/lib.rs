@@ -40,6 +40,9 @@ impl Purpose {
     }
 }
 
+/// Failure of a signature operation.
+///
+/// For forward compatibility, include a fallback arm when matching variants.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Error {
     RandomnessUnavailable,
