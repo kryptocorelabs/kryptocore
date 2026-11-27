@@ -1,13 +1,25 @@
 # KryptoCore
 
+**One Core. Many Apps. One Community.**
+
 KryptoCore is an open-source Rust library for developers building apps that
 encrypt data locally. It provides authenticated encryption and password-based
 key derivation behind a small API.
 
+It is the shared cryptographic foundation of the
+[KryptoCoreLabs ecosystem](https://github.com/kryptocorelabs), including Vault,
+Container, Messenger, Rescue and Verify. Each app owns its formats and workflows.
+The [project charter](PROJECT_CHARTER.md) sets the direction: users control their
+data and keys, without mandatory cloud services, accounts, subscriptions or
+telemetry for local use.
+
 **Development preview.** Use test data and review the [threat model](THREAT_MODEL.md)
 before integration. An independent security audit is pending.
 
-[Try Vault, our local password manager](https://github.com/kryptocorelabs/vault#try-the-desktop-preview) · [Get started with the library](#quick-start) · [Give feedback](https://github.com/kryptocorelabs/kryptocore/discussions)
+Application developers should follow the [Core security contract](CORE_SECURITY_CONTRACT.md)
+for key ownership, contexts, authenticated output and integration responsibilities.
+
+[Explore the apps](https://github.com/kryptocorelabs) · [Get started with the library](#quick-start) · [Give feedback](https://github.com/kryptocorelabs/kryptocore/discussions)
 
 [Security in 30 seconds](SECURITY-IN-BRIEF.md) · [Recover without the main app](RESCUE-FIRST.md) · [Check a download](VERIFY-DOWNLOADS.md)
 
@@ -51,7 +63,10 @@ cryptographic libraries, reproducible tests and independent scrutiny guide
 the work. Open source alone does not guarantee security.
 
 The whole ecosystem is open source under MIT for first-party code: Core,
-Vault, Firefox, Container, MSG and Rescue. See the
+Vault, Firefox, Container, MSG, Rescue and Verify. Dependencies retain their
+own license terms. Networking remains outside the Core: MSG uses Snow for
+Noise and Tor for transport. The Core does not provide a universal identity
+or login key. See the
 [project charter](PROJECT_CHARTER.md),
 [application source](https://github.com/kryptocorelabs/apps-source) and
 [Vault/Firefox source](https://github.com/kryptocorelabs/vault-source).

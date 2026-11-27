@@ -1,16 +1,24 @@
 # Why KryptoCore Exists
 
-**One open foundation. A growing ecosystem. Security built together.**
+**One Core. Many Apps. One Community.**
 
-KryptoCoreLabs develops privacy-focused software that helps people retain
-control of their data and keys. Our direction is a small, reusable security
-foundation and applications that people can understand and use without
-installing development tools or learning cryptography.
+KryptoCoreLabs builds an open-source ecosystem of privacy and security tools
+around a shared cryptographic foundation.
+
+Our goal is to make digital privacy accessible to everyone, without mandatory
+cloud services, accounts, subscriptions or unnecessary technical complexity.
+Local use must not require telemetry. Users retain control over their own
+data, keys and choices.
+
+Security claims are based on documented mechanisms, tests and transparent
+limitations. Current previews are not independently audited.
+
+**Your data. Your device. Your choice.**
 
 ## Open across the ecosystem
 
-The Core, optional shared modules, Vault, Firefox extension, Container, MSG
-and Rescue are open source. First-party code is available under the MIT
+The Core, optional shared modules, Vault, Firefox extension, Container, MSG,
+Rescue and Verify are open source. First-party code is available under the MIT
 license: people may use, inspect, modify, redistribute and build on it,
 including commercially, while retaining its notices. Dependencies keep
 their own licenses and attribution requirements. Platform requirements are
@@ -31,9 +39,11 @@ interoperability testing. We do not invent cryptographic algorithms.
 Application formats, browser integration, networking, hardware-key support,
 account management and payment logic belong outside this minimal Core.
 Optional modules, including purpose-bound signatures, have their own APIs,
-tests and documented assumptions. Applications may use established protocols
-such as Noise in addition to the Core; documentation must explain each
-component's role rather than imply the Core protects every operation.
+tests and documented assumptions. MSG uses Snow for the Noise protocol and
+Tor for transport, in addition to Core operations for local data. Applications
+own their formats, storage, interfaces and networking. The Core does not
+provide a universal identity or login key. See the
+[Core security contract](CORE_SECURITY_CONTRACT.md) for integration duties.
 
 Changes to keys, protocols, formats or public APIs need a documented reason,
 compatibility analysis and tests for failure as well as success. Additional
@@ -60,13 +70,21 @@ do not replace an independent security audit.
 ## Applications that work for people
 
 - **Vault and Firefox:** local credential storage and deliberate, origin-bound
-  browser integration.
-- **Container:** encrypted file transfer, with explicit sender-verification
-  and optional malware-check boundaries.
+  browser integration. Current Firefox pairing requires Windows; native
+  Linux/macOS desktop CI artifacts remain evaluation builds.
+- **Container:** encrypted KCC archives, including an optional self-extracting
+  Windows EXE. Archive authentication, sender verification, executable origin
+  and optional malware checks have distinct boundaries.
 - **MSG:** experimental conversations and file transfer over Tor, with local
   identities and documented connectivity and session-history limits.
 - **Rescue:** independent access to supported encrypted formats using existing
   valid credentials; recognition alone is not authentication or recovery.
+- **Verify:** offline release-manifest checks against a trusted publisher key;
+  this does not establish malware safety or replace OS code signing.
+
+Local-first means offline operation where the application's purpose permits
+it. Messenger needs a network connection and both participants online.
+An onion address is not a person's verified identity.
 
 The usability goal is download, launch, guided setup and everyday use without
 development tools. Security-relevant choices must be explained when needed.
@@ -105,10 +123,19 @@ justify concealing limitations.
 ## Explore and contribute
 
 - [Core and optional signature module](https://github.com/kryptocorelabs/kryptocore)
-- [MSG, Container and Rescue source](https://github.com/kryptocorelabs/apps-source)
+- [MSG, Container, Rescue and Verify source](https://github.com/kryptocorelabs/apps-source)
 - [Vault and Firefox source](https://github.com/kryptocorelabs/vault-source)
 - [Vault](https://github.com/kryptocorelabs/vault), [Container](https://github.com/kryptocorelabs/container),
   [MSG](https://github.com/kryptocorelabs/msg) and [Rescue](https://github.com/kryptocorelabs/rescue) downloads and user guides
+
+Start with a repository's build and test instructions and contribution guide.
+Use the [public synthetic demos](https://github.com/kryptocorelabs/kryptocorelabs/tree/main/demo)
+to explore the apps. Pick a [good first issue](https://github.com/kryptocorelabs/kryptocore/labels/good%20first%20issue)
+or ask in [Discussions](https://github.com/kryptocorelabs/kryptocore/discussions).
+Key management, protected formats and browser/network trust boundaries need
+careful review. Bug reports should include the version, platform, synthetic
+reproduction steps and expected result. Suspected vulnerabilities go through
+the private reporting instructions in [SECURITY.md](SECURITY.md).
 
 Testing to date has been carried out by the KryptoCoreLabs maintainers, locally
 and through automated CI. No independent security audit has been completed.

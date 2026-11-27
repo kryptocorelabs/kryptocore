@@ -18,6 +18,17 @@ pub mod wrapping;
 pub use context::{Context, ContextError};
 
 /// A secret key whose backing bytes are overwritten on drop.
+///
+/// Key material cannot be printed through `Debug` or implicitly duplicated.
+///
+/// ```compile_fail
+/// let key = kryptocore::Key::generate().unwrap();
+/// println!("{key:?}");
+/// ```
+/// ```compile_fail
+/// let key = kryptocore::Key::generate().unwrap();
+/// let duplicate = key.clone();
+/// ```
 pub struct Key(Zeroizing<[u8; 32]>);
 
 impl Key {
