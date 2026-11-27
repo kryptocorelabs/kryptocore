@@ -7,6 +7,9 @@ key derivation behind a small API.
 **Development preview.** Use test data and review the [threat model](THREAT_MODEL.md)
 before integration. An independent security audit is pending.
 
+Application developers should follow the [Core security contract](CORE_SECURITY_CONTRACT.md)
+for key ownership, contexts, authenticated output and integration responsibilities.
+
 [Try Vault, our local password manager](https://github.com/kryptocorelabs/vault#try-the-desktop-preview) · [Get started with the library](#quick-start) · [Give feedback](https://github.com/kryptocorelabs/kryptocore/discussions)
 
 [Security in 30 seconds](SECURITY-IN-BRIEF.md) · [Recover without the main app](RESCUE-FIRST.md) · [Check a download](VERIFY-DOWNLOADS.md)

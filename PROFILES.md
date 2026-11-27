@@ -5,6 +5,9 @@ decoder, key derivation profile and AAD bytes for files already written. The
 Python reference covers the original primitives. The new profiles have Rust
 APIs and byte-level test vectors produced with libsodium.
 
+The [Core security contract](CORE_SECURITY_CONTRACT.md) defines ownership,
+resource limits and application responsibilities when using these profiles.
+
 ## Associated data and randomness
 
 Build AAD with `Context::new(application, version, purpose, metadata)`. Choose
