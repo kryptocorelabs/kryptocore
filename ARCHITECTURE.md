@@ -15,6 +15,11 @@ own input buffers and any copies they make.
   vectors and bidirectional tests check interoperability independently of
   application serialization.
 
+The Python reference requires PyNaCl 1.6.2 or later. Its bundled libsodium
+includes the fix for CVE-2025-69277. When building PyNaCl against system
+libsodium, the deployment must supply a patched system library.
+[PyNaCl changelog](https://pypi.org/project/PyNaCl/1.6.2/)
+
 The Rust API also exposes canonical AAD contexts and key wrapping. The optional
 `stream` feature provides authenticated framing for finite byte streams. Vault
 and other callers own container formats, key slots, recovery, persistence, and
@@ -40,4 +45,9 @@ The Rust API returns `KeyDerivationError::MemoryUnavailable` from
 systems can accept the reservation and run out of
 memory when the pages are written. Concurrency limits remain necessary in
 those environments. The Linux CI runs a parallel derivation test and checks
-that a process with a 192 MiB virtual memory limit returns the error.
+that a process with a 192 MiB virtual memory limit returns the error. Windows
+CI runs the same reservation-failure test in an isolated Job Object with a
+192 MiB process committed-memory limit, assigned before the child starts.
+The limit applies only to that test process. These checks exercise rejected
+reservations, and do not establish graceful handling of every OS out-of-memory
+condition. See the [Windows process-memory limit](https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-jobobject_extended_limit_information).

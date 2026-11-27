@@ -165,6 +165,73 @@ mod tests {
         }
     }
 
+    struct ReadFailure;
+
+    impl Read for ReadFailure {
+        fn read(&mut self, _: &mut [u8]) -> io::Result<usize> {
+            Err(io::Error::new(io::ErrorKind::Other, "synthetic reader detail"))
+        }
+    }
+
+    #[test]
+    fn read_failures_do_not_finish_streams_or_expose_reader_details() {
+        let key = Key::generate().unwrap();
+        let context = context();
+        let message = vec![0x12; CHUNK_BYTES];
+        let mut interrupted = message.as_slice().chain(ReadFailure);
+        let mut encrypted = Vec::new();
+        let failure = StreamError::Io(io::ErrorKind::Other);
+        assert_eq!(
+            encrypt_stream(&key, &mut interrupted, &mut encrypted, &context),
+            Err(failure)
+        );
+        assert_eq!(encrypted.len(), HEADER_BYTES + RECORD_BYTES);
+        assert!(!failure.to_string().contains("synthetic reader detail"));
+
+        let mut interrupted = encrypted.as_slice().chain(ReadFailure);
+        let mut staged = Vec::new();
+        assert_eq!(
+            decrypt_stream(&key, &mut interrupted, &mut staged, &context),
+            Err(failure)
+        );
+        assert_eq!(staged, message);
+        assert_eq!(
+            decrypt_stream(&key, &mut encrypted.as_slice(), &mut io::sink(), &context),
+            Err(StreamError::AuthenticationFailed)
+        );
+    }
+
+    #[test]
+    fn short_writers_return_errors_after_a_partial_output() {
+        let key = Key::generate().unwrap();
+        let context = context();
+        let message = vec![0x23; CHUNK_BYTES + 1];
+        let mut header_only = [0; HEADER_BYTES];
+        assert_eq!(
+            encrypt_stream(
+                &key,
+                &mut message.as_slice(),
+                &mut header_only.as_mut_slice(),
+                &context,
+            ),
+            Err(StreamError::Io(io::ErrorKind::WriteZero))
+        );
+
+        let mut encrypted = Vec::new();
+        encrypt_stream(&key, &mut message.as_slice(), &mut encrypted, &context).unwrap();
+        let mut staged = vec![0; CHUNK_BYTES];
+        assert_eq!(
+            decrypt_stream(
+                &key,
+                &mut encrypted.as_slice(),
+                &mut staged.as_mut_slice(),
+                &context,
+            ),
+            Err(StreamError::Io(io::ErrorKind::WriteZero))
+        );
+        assert_eq!(staged, message[..CHUNK_BYTES]);
+    }
+
     #[test]
     fn round_trip_across_chunk_boundaries_and_short_reads() {
         let key = Key::generate().unwrap();

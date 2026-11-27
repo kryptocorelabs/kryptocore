@@ -31,6 +31,23 @@ jobs:
           test_binary=$(cargo +stable test --locked --release --test argon2_memory --no-run --message-format=json |
             jq -er 'select(.reason == "compiler-artifact" and .target.name == "argon2_memory") | .executable // empty')
           (ulimit -v 196608 && "$test_binary" --ignored --exact argon2id_reports_reservation_failure)
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        if: runner.os == 'Windows'
+        with:
+          python-version: '3.14'
+          architecture: x64
+      - name: Check Argon2id under a Windows process memory limit
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $artifacts = cargo +stable test --locked --release --test argon2_memory --no-run --message-format=json
+          if ($LASTEXITCODE -ne 0) { throw 'Could not build the Argon2id memory test.' }
+          $binary = @($artifacts | ForEach-Object { $_ | ConvertFrom-Json } |
+            Where-Object { $_.reason -eq 'compiler-artifact' -and $_.target.name -eq 'argon2_memory' -and $_.executable } |
+            ForEach-Object { $_.executable })
+          if ($binary.Count -ne 1) { throw 'Expected one Argon2id memory test executable.' }
+          python tests/check_argon2_memory_windows.py $binary[0]
+          if ($LASTEXITCODE -ne 0) { throw 'The Windows memory-limit test failed.' }
 
   test:
     strategy:
@@ -63,6 +80,31 @@ jobs:
       - run: cargo +stable test --locked --release -p kryptocore --test interop -- --ignored
       - name: Cross-check optional signatures with PyNaCl
         run: cargo +stable test --locked --release -p kryptocore-signatures --test interop -- --ignored
+
+  python-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.13'
+      - name: Resolve the Python reference in an isolated environment
+        shell: bash
+        run: |
+          python -m venv "$RUNNER_TEMP/core-python-runtime"
+          runtime="$RUNNER_TEMP/core-python-runtime/bin/python"
+          "$runtime" -m pip install .
+          "$runtime" -m pip freeze --exclude kryptocore --exclude pip --exclude setuptools --exclude wheel > "$RUNNER_TEMP/core-python-runtime-requirements.txt"
+      - name: Audit the resolved runtime dependencies
+        shell: bash
+        run: |
+          python -m venv "$RUNNER_TEMP/core-python-audit"
+          auditor="$RUNNER_TEMP/core-python-audit/bin/python"
+          "$auditor" -m pip install 'pip-audit==2.10.1'
+          "$auditor" -m pip_audit --requirement "$RUNNER_TEMP/core-python-runtime-requirements.txt" --no-deps --disable-pip
 
   audit:
     runs-on: ubuntu-latest
@@ -143,7 +185,7 @@ jobs:
 
   attest-core:
     if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
-    needs: [compare-artifacts, rust, test, audit, fuzz]
+    needs: [compare-artifacts, rust, test, audit, python-audit, fuzz]
     runs-on: ubuntu-24.04
     permissions:
       contents: read
